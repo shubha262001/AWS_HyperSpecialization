@@ -9,7 +9,7 @@
 
 echo 'Starting CodeCommit CloudFormation stack'
 aws cloudformation create-stack \
-  --stack-name CodeCommit \
+  --stack-name CodeCommitsk \
   --template-body file://codecommit.yaml \
   --parameters \
       ParameterKey=FrontendRepoName,ParameterValue=AnyCompanyReads-frontend \
