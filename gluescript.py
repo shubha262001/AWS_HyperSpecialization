@@ -1,29 +1,16 @@
-from pyspark.context import SparkContext
-from awsglue.context import GlueContext
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, translate, expr
-from awsglue.dynamicframe import DynamicFrame
-from awsglue.utils import getResolvedOptions
-import sys
-from pyspark.sql.types import IntegerType, FloatType
 
-# Create a SparkContext
-sc = SparkContext()
-glueContext = GlueContext(sc)
-spark = glueContext.spark_session
-
-# Get job arguments
-args = getResolvedOptions(sys.argv, ['JOB_NAME'])
-
-# Define source and target paths
-s3_input_path = "s3://amazonsales-capstone-sk/cleanedfiles"
-s3_output_path = "s3://amazonsales-capstone-sk/transformed/"
+# Create a SparkSession
+spark = SparkSession.builder.appName("Data_Transformation").getOrCreate()
 
 # Read data from S3
 dynamic_frame = glueContext.create_dynamic_frame.from_catalog(database="amazonsales-sk-capstone", table_name="cleanedfiles", transformation_ctx="dynamic_frame")
 
 # Convert DynamicFrame to DataFrame
 df = dynamic_frame.toDF()
+
+# Define the output path for the single Parquet file
+s3_output_path_final = "s3://amazonsales-capstone-sk/transformed/single_file/"
 
 # Function to remove symbols from column values
 def remove_symbols(column):
@@ -74,5 +61,8 @@ def apply_business_logic(df):
 # Apply business logic transformations
 df = apply_business_logic(df)
 
-# Write results to S3
-df.write.parquet(s3_output_path, mode="overwrite")
+# Repartition the DataFrame to a single partition
+df_single_partition = df.repartition(1)
+
+# Write results to S3 as a single Parquet file
+df_single_partition.write.parquet(s3_output_path_final, mode="overwrite")
