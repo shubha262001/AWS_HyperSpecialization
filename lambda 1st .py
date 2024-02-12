@@ -42,7 +42,7 @@ def lambda_handler(event, context):
             parquet_file.seek(0)
             
             # Upload the Parquet file to the cleaned files folder
-            cleaned_object_key = 'cleanedfiles/' + object_key.replace('.csv', '.parquet')
+            cleaned_object_key = 'cleanedfiles/' + object_key.split('/')[-1].replace('.csv', '.parquet')
             s3.put_object(Bucket=bucket_name, Key=cleaned_object_key, Body=parquet_file)
         except Exception as e:
             print(f"An error occurred: {str(e)}")
