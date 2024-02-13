@@ -1,3 +1,6 @@
+Error Category: QUERY_ERROR; AnalysisException: Cannot resolve column name "overall_rating" among (product_id, product_name, discounted_price, actual_price, discount_percentage, rating, rating_count, about_product, user_id, category_struct)
+
+
 Error Category: QUERY_ERROR; AnalysisException: Can't extract value from category#37: need struct type but got string
 
 
