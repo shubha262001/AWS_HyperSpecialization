@@ -32,7 +32,17 @@ cleaned_data = cleaned_data\
     .withColumnRenamed('discounted_price(₹)', 'discounted_price')\
     .withColumnRenamed('actual_price(₹)', 'actual_price')\
     .withColumn('discount_percentage', regexp_replace('discount_percentage', '%', '').cast('double'))\
-    .withColumnRenamed('rating', 'overall_rating')
+    .withColumnRenamed('rating', 'overall_rating')\
+    .withColumn("category", F.split(cleaned_data["category"], "\\|"))
+
+## Extracting category layers
+cleaned_data = cleaned_data\
+    .withColumn('category_layer_1', cleaned_data['category'][0])\
+    .withColumn('category_layer_2', cleaned_data['category'][1])\
+    .withColumn('category_layer_3', cleaned_data['category'][2])\
+    .withColumn('category_layer_4', cleaned_data['category'][3])\
+    .withColumn('category_layer_5', cleaned_data['category'][4])\
+    .drop('category')
 
 ## Calculate percentages of bad reviews at the product level
 product_bad_reviews_percentage = cleaned_data\
