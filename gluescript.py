@@ -1,11 +1,12 @@
 from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, translate, expr
+from pyspark.sql.functions import col, translate, expr, count
 from awsglue.dynamicframe import DynamicFrame
 from awsglue.utils import getResolvedOptions
 import sys
 from pyspark.sql.types import IntegerType, FloatType
+from pyspark.sql.window import Window
 
 # Create a SparkContext
 sc = SparkContext()
@@ -23,7 +24,7 @@ s3_output_path = "s3://amazonsales-capstone-sk/transformed/"
 dynamic_frame = glueContext.create_dynamic_frame.from_catalog(database="amazonsales-sk-capstone", table_name="cleanedfiles", transformation_ctx="dynamic_frame")
 
 # Convert DynamicFrame to DataFrame
-df = dynamic_frame.toDF()
+df_original = dynamic_frame.toDF()
 
 # Function to remove symbols from column values
 def remove_symbols(column):
@@ -71,11 +72,23 @@ def apply_business_logic(df):
     df = change_data_formats(df)
     return df
 
-# Apply business logic transformations
-df = apply_business_logic(df)
+# Apply basic data cleaning and transformation operations
+df_cleaned = apply_business_logic(df_original)
+
+# Apply additional business logic transformations
+df_above_4 = df_cleaned.filter(col("rating") > 4.0)
+df_above_4_below_3 = df_cleaned.filter((col("rating") > 4.0) & (col("rating") < 3.0))
+
+windowSpec = Window.partitionBy("product_id")
+df_with_bad_review_percentage = df_cleaned.withColumn("bad_review_percentage", (count("product_id").over(windowSpec) - 1) / count("product_id").over(windowSpec) * 100)
+
+df_ranked_by_rating_count = df_cleaned.withColumn("rank", expr("rank() over (order by rating_count desc)"))
+
+# Combine all DataFrames into a single DataFrame
+final_df = df_above_4.union(df_above_4_below_3).union(df_with_bad_review_percentage).union(df_ranked_by_rating_count)
 
 # Repartition the DataFrame to a single partition
-df_single_partition = df.repartition(1)
+final_df_single_partition = final_df.repartition(1)
 
 # Write results to S3 as a single Parquet file
-df_single_partition.write.parquet(s3_output_path, mode="overwrite")
+final_df_single_partition.write.parquet(s3_output_path, mode="overwrite")
