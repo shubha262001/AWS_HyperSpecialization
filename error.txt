@@ -1,3 +1,9 @@
+An error occurred while triggering the Glue job: An error occurred (AccessDeniedException) when calling the StartJobRun operation: User: arn:aws:sts::896889985719:assumed-role/amazonsales-capstone-policyrole-1stlambdafun/gluefun-capstone-sk is not authorized to perform: glue:StartJobRun on resource: arn:aws:glue:us-east-1:896889985719:job/amazonsales-sk-job because no identity-based policy allows the glue:StartJobRun action
+
+
+
+
+
 Error Category: QUERY_ERROR; AnalysisException: Union can only be performed on tables with the same number of columns, but the first table has 18 columns and the third table has 19 columns;
 
 
