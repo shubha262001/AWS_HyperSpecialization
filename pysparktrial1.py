@@ -5,7 +5,7 @@ from awsglue.job import Job
 from awsglue.transforms import *
 from awsglue.utils import getResolvedOptions
 from pyspark.sql import functions as F
-from pyspark.sql.functions import regexp_replace, split, when
+from pyspark.sql.functions import regexp_replace, split, struct
 
 # Define source and target paths
 s3_input_path = "s3://amazonsales-capstone-sk/cleanedfiles"
@@ -32,15 +32,10 @@ cleaned_data = cleaned_data\
     .withColumnRenamed('discounted_price(₹)', 'discounted_price')\
     .withColumn('discount_percentage', regexp_replace('discount_percentage', '%', '').cast('double'))
 
-## Splitting the category column into separate layers
-cleaned_data = cleaned_data\
-    .withColumn("category", split(cleaned_data["category"], "\\|"))\
-    .withColumn('category_layer_1', cleaned_data['category'][0])\
-    .withColumn('category_layer_2', cleaned_data['category'][1])\
-    .withColumn('category_layer_3', cleaned_data['category'][2])\
-    .withColumn('category_layer_4', cleaned_data['category'][3])\
-    .withColumn('category_layer_5', cleaned_data['category'][4])\
-    .drop('category')
+## Splitting the category column into separate layers and converting to struct type
+split_category = split(cleaned_data["category"], "\\|")
+cleaned_data = cleaned_data.withColumn("category_struct", struct(split_category[0], split_category[1], split_category[2], split_category[3], split_category[4]))\
+    .drop("category")
 
 ## Calculate percentages of bad reviews at the product level
 bad_reviews_percentage = (F.sum(F.when(cleaned_data['overall_rating'] < 3.0, 1).otherwise(0)) / F.count('*') * 100).alias('bad_reviews_percentage')
@@ -56,12 +51,13 @@ cleaned_data = cleaned_data.withColumn('above_4_below_3', above_4_below_3)
 
 ## Establish product hierarchy by identifying top performers
 top_performers = cleaned_data\
-    .groupBy('category_layer_1', 'category_layer_2', 'category_layer_3', 'category_layer_4', 'category_layer_5')\
+    .groupBy("category_struct")\
     .agg(F.avg('overall_rating').alias('average_rating'), F.count('*').alias('product_count'))\
     .orderBy(F.desc('average_rating'), F.desc('product_count'))
 
 ## Merge all results into a single DataFrame
-final_df = cleaned_data.join(top_performers, ['category_layer_1', 'category_layer_2', 'category_layer_3', 'category_layer_4', 'category_layer_5'], 'left_outer')
+final_df = cleaned_data.join(top_performers, cleaned_data['category_struct'] == top_performers['category_struct'], 'left_outer')\
+    .drop(top_performers['category_struct'])
 
 ## Write results to S3 as a single Parquet file
 final_df.write.parquet(s3_output_path, mode="overwrite")
