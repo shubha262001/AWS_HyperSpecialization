@@ -1,3 +1,6 @@
+Error Category: QUERY_ERROR; AnalysisException: grouping expressions sequence is empty, and 'product_id' is not an aggregate function. Wrap '(((CAST(sum(CASE WHEN (CAST(rating AS DOUBLE) < 3.0D) THEN 1 ELSE 0 END) AS DOUBLE) / CAST(count(1) AS DOUBLE)) * CAST(100 AS DOUBLE)) AS bad_reviews_percentage)' in windowing function(s) or wrap 'product_id' in first() (or first_value) if you don't care which value you get.;
+
+
 Error Category: QUERY_ERROR; AnalysisException: Cannot resolve column name "overall_rating" among (product_id, product_name, discounted_price, actual_price, discount_percentage, rating, rating_count, about_product, user_id, category_struct)
 
 
