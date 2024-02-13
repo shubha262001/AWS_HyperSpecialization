@@ -1,3 +1,29 @@
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Effect": "Allow",
+			"Action": "glue:GetJob",
+			"Resource": "arn:aws:glue:us-east-1:896889985719:job/final serires try"
+		}
+	]
+}
+
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Effect": "Allow",
+			"Action": "glue:StartJobRun",
+			"Resource": "arn:aws:glue:us-east-1:896889985719:job/final serires try"
+		}
+	]
+}
+
+
+
+
+
 An error occurred while triggering the Glue job: An error occurred (AccessDeniedException) when calling the StartJobRun operation: User: arn:aws:sts::896889985719:assumed-role/amazonsales-capstone-policyrole-1stlambdafun/gluefun-capstone-sk is not authorized to perform: glue:StartJobRun on resource: arn:aws:glue:us-east-1:896889985719:job/amazonsales-sk-job because no identity-based policy allows the glue:StartJobRun action
 
 
