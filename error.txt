@@ -1,0 +1,248 @@
+error fr above code u provided Error Category: QUERY_ERROR; AnalysisException: Union can only be performed on tables with the same number of columns, but the first table has 16 columns and the third table has 17 columns;
+24/02/13 06:26:31 INFO LogPusher: stopping
+24/02/13 06:26:31 INFO CloudWatchMetricsEmitter: Emit job error metrics
+24/02/13 06:26:31 INFO ProcessLauncher: Error Category: QUERY_ERROR
+24/02/13 06:26:31 INFO ProcessLauncher: enhancedFailureReason: Error Category: QUERY_ERROR; AnalysisException: Union can only be performed on tables with the same number of columns, but the first table has 16 columns and the third table has 17 columns;
+24/02/13 06:26:31 INFO ProcessLauncher: ExceptionErrorMessage failureReason: AnalysisException: Union can only be performed on tables with the same number of columns, but the first table has 16 columns and the third table has 17 columns;
+24/02/13 06:26:31 INFO ProcessLauncher: postprocessing
+24/02/13 06:26:31 INFO ProcessLauncher: Enhance failure reason and emit cloudwatch error metrics.
+24/02/13 06:26:31 WARN OOMExceptionHandler: Failed to extract executor id from error message.
+24/02/13 06:26:31 ERROR ProcessLauncher: Error from Python:Traceback (most recent call last):
+  File "/tmp/amazonsales-sk-job.py", line 88, in <module>
+    final_df = df_above_4.union(df_above_4_below_3).union(df_with_bad_review_percentage).union(df_ranked_by_rating_count)
+  File "/opt/amazon/spark/python/lib/pyspark.zip/pyspark/sql/dataframe.py", line 2258, in union
+    return DataFrame(self._jdf.union(other._jdf), self.sparkSession)
+  File "/opt/amazon/spark/python/lib/py4j-0.10.9.5-src.zip/py4j/java_gateway.py", line 1321, in __call__
+    return_value = get_return_value(
+  File "/opt/amazon/spark/python/lib/pyspark.zip/pyspark/sql/utils.py", line 196, in deco
+    raise converted from None
+pyspark.sql.utils.AnalysisException: Union can only be performed on tables with the same number of columns, but the first table has 16 columns and the third table has 17 columns;
+'Union false, false
+:- Filter (cast(rating#248 as double) > 4.0)
+:  +- Project [product_id#219, product_name#220, category#221, discounted_price(₹)#135, actual_price(₹)#152, discount_percentage#186, rating#248, cast(rating_count#265 as int) AS rating_count#282, about_product#224, user_id#225, user_name#226, review_id#227, review_title#228, review_content#229, img_link#230, product_link#231]
+:     +- Project [product_id#219, product_name#220, category#221, discounted_price(₹)#135, actual_price(₹)#152, discount_percentage#186, rating#248, translate(rating_count#223, ₹,%, ) AS rating_count#265, about_product#224, user_id#225, user_name#226, review_id#227, review_title#228, review_content#229, img_link#230, product_link#231]
+:        +- Project [product_id#219, product_name#220, category#221, discounted_price(₹)#135, actual_price(₹)#152, discount_percentage#186, cast(rating#222 as float) AS rating#248, rating_count#223, about_product#224, user_id#225, user_name#226, review_id#227, review_title#228, review_content#229, img_link#230, product_link#231]
+:           +- Deduplicate [rating_count#223, rating#222, product_id#219, actual_price(₹)#152, discounted_price(₹)#135]
+:              +- Project [coalesce(product_id#35, cast(N.A. as string)) AS product_id#219, coalesce(product_name#36, cast(N.A. as string)) AS product_name#220, coalesce(category#37, cast(N.A. as string)) AS category#221, discounted_price(₹)#135, actual_price(₹)#152, discount_percentage#186, coalesce(rating#41, cast(N.A. as string)) AS rating#222, coalesce(rating_count#42, cast(N.A. as string)) AS rating_count#223, coalesce(about_product#43, cast(N.A. as string)) AS about_product#224, coalesce(user_id#44, cast(N.A. as string)) AS user_id#225, coalesce(user_name#45, cast(N.A. as string)) AS user_name#226, coalesce(review_id#46, cast(N.A. as string)) AS review_id#227, coalesce(review_title#47, cast(N.A. as string)) AS review_title#228, coalesce(review_content#48, cast(N.A. as string)) AS review_content#229, coalesce(img_link#49, cast(N.A. as string)) AS img_link#230, coalesce(product_link#50, cast(N.A. as string)) AS product_link#231]
+:                 +- Project [product_id#35, product_name#36, category#37, discounted_price(₹)#135, actual_price(₹)#152, cast(discount_percentage#169 as float) AS discount_percentage#186, rating#41, rating_count#42, about_product#43, user_id#44, user_name#45, review_id#46, review_title#47, review_content#48, img_link#49, product_link#50]
+:                    +- Project [product_id#35, product_name#36, category#37, discounted_price(₹)#135, actual_price(₹)#152, translate(discount_percentage#40, ₹,%, ) AS discount_percentage#169, rating#41, rating_count#42, about_product#43, user_id#44, user_name#45, review_id#46, review_title#47, review_content#48, img_link#49, product_link#50]
+:                       +- Project [product_id#35, product_name#36, category#37, discounted_price(₹)#135, cast(actual_price(₹)#118 as int) AS actual_price(₹)#152, discount_percentage#40, rating#41, rating_count#42, about_product#43, user_id#44, user_name#45, review_id#46, review_title#47, review_content#48, img_link#49, product_link#50]
+:                          +- Project [product_id#35, product_name#36, category#37, cast(discounted_price(₹)#101 as int) AS discounted_price(₹)#135, actual_price(₹)#118, discount_percentage#40, rating#41, rating_count#42, about_product#43, user_id#44, user_name#45, review_id#46, review_title#47, review_content#48, img_link#49, product_link#50]
+:                             +- Project [product_id#35, product_name#36, category#37, discounted_price(₹)#101, translate(cast(actual_price(₹)#84 as string), ₹,%, ) AS actual_price(₹)#118, discount_percentage#40, rating#41, rating_count#42, about_product#43, user_id#44, user_name#45, review_id#46, review_title#47, review_content#48, img_link#49, product_link#50]
+:                                +- Project [product_id#35, product_name#36, category#37, translate(cast(discounted_price(₹)#67 as string), ₹,%, ) AS discounted_price(₹)#101, actual_price(₹)#84, discount_percentage#40, rating#41, rating_count#42, about_product#43, user_id#44, user_name#45, review_id#46, review_title#47, review_content#48, img_link#49, product_link#50]
+:                                   +- Project [product_id#35, product_name#36, category#37, discounted_price(₹)#67, actual_price#39 AS actual_price(₹)#84, discount_percentage#40, rating#41, rating_count#42, about_product#43, user_id#44, user_name#45, review_id#46, review_title#47, review_content#48, img_link#49, product_link#50]
+:                                      +- Project [product_id#35, product_name#36, category#37, discounted_price#38 AS discounted_price(₹)#67, actual_price#39, discount_percentage#40, rating#41, rating_count#42, about_product#43, user_id#44, user_name#45, review_id#46, review_title#47, review_content#48, img_link#49, product_link#50]
+:                                         +- LogicalRDD [product_id#35, product_name#36, category#37, discounted_price#38, actual_price#39, discount_percentage#40, rating#41, rating_count#42, about_product#43, user_id#44, user_name#45, review_id#46, review_title#47, review_content#48, img_link#49, product_link#50], false
+:- Project [product_id#219 AS product_id#363, product_name#220 AS product_name#364, category#221 AS category#365, discounted_price(₹)#135 AS discounted_price(₹)#366, actual_price(₹)#152 AS actual_price(₹)#367, discount_percentage#186 AS discount_percentage#368, rating#248 AS rating#369, rating_count#282 AS rating_count#370, about_product#224 AS about_product#371, user_id#225 AS user_id#372, user_name#226 AS user_name#373, review_id#227 AS review_id#374, review_title#228 AS review_title#375, review_content#229 AS review_content#376, img_link#230 AS img_link#377, product_link#231 AS product_link#378]
+:  +- Filter ((cast(rating#248 as double) > 4.0) AND (cast(rating#248 as double) < 3.0))
+:     +- Project [product_id#219, product_name#220, category#221, discounted_price(₹)#135, actual_price(₹)#152, discount_percentage#186, rating#248, cast(rating_count#265 as int) AS rating_count#282, about_product#224, user_id#225, user_name#226, review_id#227, review_title#228, review_content#229, img_link#230, product_link#231]
+:        +- Project [product_id#219, product_name#220, category#221, discounted_price(₹)#135, actual_price(₹)#152, discount_percentage#186, rating#248, translate(rating_count#223, ₹,%, ) AS rating_count#265, about_product#224, user_id#225, user_name#226, review_id#227, review_title#228, review_content#229, img_link#230, product_link#231]
+:           +- Project [product_id#219, product_name#220, category#221, discounted_price(₹)#135, actual_price(₹)#152, discount_percentage#186, cast(rating#222 as float) AS rating#248, rating_count#223, about_product#224, user_id#225, user_name#226, review_id#227, review_title#228, review_content#229, img_link#230, product_link#231]
+:              +- Deduplicate [rating_count#223, rating#222, product_id#219, actual_price(₹)#152, discounted_price(₹)#135]
+:                 +- Project [coalesce(product_id#347, cast(N.A. as string)) AS product_id#219, coalesce(product_name#348, cast(N.A. as string)) AS product_name#220, coalesce(category#349, cast(N.A. as string)) AS category#221, discounted_price(₹)#135, actual_price(₹)#152, discount_percentage#186, coalesce(rating#353, cast(N.A. as string)) AS rating#222, coalesce(rating_count#354, cast(N.A. as string)) AS rating_count#223, coalesce(about_product#355, cast(N.A. as string)) AS about_product#224, coalesce(user_id#356, cast(N.A. as string)) AS user_id#225, coalesce(user_name#357, cast(N.A. as string)) AS user_name#226, coalesce(review_id#358, cast(N.A. as string)) AS review_id#227, coalesce(review_title#359, cast(N.A. as string)) AS review_title#228, coalesce(review_content#360, cast(N.A. as string)) AS review_content#229, coalesce(img_link#361, cast(N.A. as string)) AS img_link#230, coalesce(product_link#362, cast(N.A. as string)) AS product_link#231]
+:                    +- Project [product_id#347, product_name#348, category#349, discounted_price(₹)#135, actual_price(₹)#152, cast(discount_percentage#169 as float) AS discount_percentage#186, rating#353, rating_count#354, about_product#355, user_id#356, user_name#357, review_id#358, review_title#359, review_content#360, img_link#361, product_link#362]
+:                       +- Project [product_id#347, product_name#348, category#349, discounted_price(₹)#135, actual_price(₹)#152, translate(discount_percentage#352, ₹,%, ) AS discount_percentage#169, rating#353, rating_count#354, about_product#355, user_id#356, user_name#357, review_id#358, review_title#359, review_content#360, img_link#361, product_link#362]
+:                          +- Project [product_id#347, product_name#348, category#349, discounted_price(₹)#135, cast(actual_price(₹)#118 as int) AS actual_price(₹)#152, discount_percentage#352, rating#353, rating_count#354, about_product#355, user_id#356, user_name#357, review_id#358, review_title#359, review_content#360, img_link#361, product_link#362]
+:                             +- Project [product_id#347, product_name#348, category#349, cast(discounted_price(₹)#101 as int) AS discounted_price(₹)#135, actual_price(₹)#118, discount_percentage#352, rating#353, rating_count#354, about_product#355, user_id#356, user_name#357, review_id#358, review_title#359, review_content#360, img_link#361, product_link#362]
+:                                +- Project [product_id#347, product_name#348, category#349, discounted_price(₹)#101, translate(cast(actual_price(₹)#84 as string), ₹,%, ) AS actual_price(₹)#118, discount_percentage#352, rating#353, rating_count#354, about_product#355, user_id#356, user_name#357, review_id#358, review_title#359, review_content#360, img_link#361, product_link#362]
+:                                   +- Project [product_id#347, product_name#348, category#349, translate(cast(discounted_price(₹)#67 as string), ₹,%, ) AS discounted_price(₹)#101, actual_price(₹)#84, discount_percentage#352, rating#353, rating_count#354, about_product#355, user_id#356, user_name#357, review_id#358, review_title#359, review_content#360, img_link#361, product_link#362]
+:                                      +- Project [product_id#347, product_name#348, category#349, discounted_price(₹)#67, actual_price#351 AS actual_price(₹)#84, discount_percentage#352, rating#353, rating_count#354, about_product#355, user_id#356, user_name#357, review_id#358, review_title#359, review_content#360, img_link#361, product_link#362]
+:                                         +- Project [product_id#347, product_name#348, category#349, discounted_price#350 AS discounted_price(₹)#67, actual_price#351, discount_percentage#352, rating#353, rating_count#354, about_product#355, user_id#356, user_name#357, review_id#358, review_title#359, review_content#360, img_link#361, product_link#362]
+:                                            +- LogicalRDD [product_id#347, product_name#348, category#349, discounted_price#350, actual_price#351, discount_percentage#352, rating#353, rating_count#354, about_product#355, user_id#356, user_name#357, review_id#358, review_title#359, review_content#360, img_link#361, product_link#362], false
++- Project [product_id#219 AS product_id#411, product_name#220 AS product_name#412, category#221 AS category#413, discounted_price(₹)#135 AS discounted_price(₹)#414, actual_price(₹)#152 AS actual_price(₹)#415, discount_percentage#186 AS discount_percentage#416, rating#248 AS rating#417, rating_count#282 AS rating_count#418, about_product#224 AS about_product#419, user_id#225 AS user_id#420, user_name#226 AS user_name#421, review_id#227 AS review_id#422, review_title#228 AS review_title#423, review_content#229 AS review_content#424, img_link#230 AS img_link#425, product_link#231 AS product_link#426, bad_review_percentage#301 AS bad_review_percentage#427]
+   +- Project [product_id#219, product_name#220, category#221, discounted_price(₹)#135, actual_price(₹)#152, discount_percentage#186, rating#248, rating_count#282, about_product#224, user_id#225, user_name#226, review_id#227, review_title#228, review_content#229, img_link#230, product_link#231, ((cast((_we0#302L - cast(1 as bigint)) as double) / cast(_we1#303L as double)) * cast(100 as double)) AS bad_review_percentage#301]
+      +- Window [count(product_id#219) windowspecdefinition(product_id#219, specifiedwindowframe(RowFrame, unboundedpreceding$(), unboundedfollowing$())) AS _we0#302L, count(product_id#219) windowspecdefinition(product_id#219, specifiedwindowframe(RowFrame, unboundedpreceding$(), unboundedfollowing$())) AS _we1#303L], [product_id#219]
+         +- Project [product_id#219, product_name#220, category#221, discounted_price(₹)#135, actual_price(₹)#152, discount_percentage#186, rating#248, rating_count#282, about_product#224, user_id#225, user_name#226, review_id#227, review_title#228, review_content#229, img_link#230, product_link#231]
+            +- Project [product_id#219, product_name#220, category#221, discounted_price(₹)#135, actual_price(₹)#152, discount_percentage#186, rating#248, cast(rating_count#265 as int) AS rating_count#282, about_product#224, user_id#225, user_name#226, review_id#227, review_title#228, review_content#229, img_link#230, product_link#231]
+               +- Project [product_id#219, product_name#220, category#221, discounted_price(₹)#135, actual_price(₹)#152, discount_percentage#186, rating#248, translate(rating_count#223, ₹,%, ) AS rating_count#265, about_product#224, user_id#225, user_name#226, review_id#227, review_title#228, review_content#229, img_link#230, product_link#231]
+                  +- Project [product_id#219, product_name#220, category#221, discounted_price(₹)#135, actual_price(₹)#152, discount_percentage#186, cast(rating#222 as float) AS rating#248, rating_count#223, about_product#224, user_id#225, user_name#226, review_id#227, review_title#228, review_content#229, img_link#230, product_link#231]
+                     +- Deduplicate [rating_count#223, rating#222, product_id#219, actual_price(₹)#152, discounted_price(₹)#135]
+                        +- Project [coalesce(product_id#395, cast(N.A. as string)) AS product_id#219, coalesce(product_name#396, cast(N.A. as string)) AS product_name#220, coalesce(category#397, cast(N.A. as string)) AS category#221, discounted_price(₹)#135, actual_price(₹)#152, discount_percentage#186, coalesce(rating#401, cast(N.A. as string)) AS rating#222, coalesce(rating_count#402, cast(N.A. as string)) AS rating_count#223, coalesce(about_product#403, cast(N.A. as string)) AS about_product#224, coalesce(user_id#404, cast(N.A. as string)) AS user_id#225, coalesce(user_name#405, cast(N.A. as string)) AS user_name#226, coalesce(review_id#406, cast(N.A. as string)) AS review_id#227, coalesce(review_title#407, cast(N.A. as string)) AS review_title#228, coalesce(review_content#408, cast(N.A. as string)) AS review_content#229, coalesce(img_link#409, cast(N.A. as string)) AS img_link#230, coalesce(product_link#410, cast(N.A. as string)) AS product_link#231]
+                           +- Project [product_id#395, product_name#396, category#397, discounted_price(₹)#135, actual_price(₹)#152, cast(discount_percentage#169 as float) AS discount_percentage#186, rating#401, rating_count#402, about_product#403, user_id#404, user_name#405, review_id#406, review_title#407, review_content#408, img_link#409, product_link#410]
+                              +- Project [product_id#395, product_name#396, category#397, discounted_price(₹)#135, actual_price(₹)#152, translate(discount_percentage#400, ₹,%, ) AS discount_percentage#169, rating#401, rating_count#402, about_product#403, user_id#404, user_name#405, review_id#406, review_title#407, review_content#408, img_link#409, product_link#410]
+                                 +- Project [product_id#395, product_name#396, category#397, discounted_price(₹)#135, cast(actual_price(₹)#118 as int) AS actual_price(₹)#152, discount_percentage#400, rating#401, rating_count#402, about_product#403, user_id#404, user_name#405, review_id#406, review_title#407, review_content#408, img_link#409, product_link#410]
+                                    +- Project [product_id#395, product_name#396, category#397, cast(discounted_price(₹)#101 as int) AS discounted_price(₹)#135, actual_price(₹)#118, discount_percentage#400, rating#401, rating_count#402, about_product#403, user_id#404, user_name#405, review_id#406, review_title#407, review_content#408, img_link#409, product_link#410]
+                                       +- Project [product_id#395, product_name#396, category#397, discounted_price(₹)#101, translate(cast(actual_price(₹)#84 as string), ₹,%, ) AS actual_price(₹)#118, discount_percentage#400, rating#401, rating_count#402, about_product#403, user_id#404, user_name#405, review_id#406, review_title#407, review_content#408, img_link#409, product_link#410]
+                                          +- Project [product_id#395, product_name#396, category#397, translate(cast(discounted_price(₹)#67 as string), ₹,%, ) AS discounted_price(₹)#101, actual_price(₹)#84, discount_percentage#400, rating#401, rating_count#402, about_product#403, user_id#404, user_name#405, review_id#406, review_title#407, review_content#408, img_link#409, product_link#410]
+                                             +- Project [product_id#395, product_name#396, category#397, discounted_price(₹)#67, actual_price#399 AS actual_price(₹)#84, discount_percentage#400, rating#401, rating_count#402, about_product#403, user_id#404, user_name#405, review_id#406, review_title#407, review_content#408, img_link#409, product_link#410]
+                                                +- Project [product_id#395, product_name#396, category#397, discounted_price#398 AS discounted_price(₹)#67, actual_price#399, discount_percentage#400, rating#401, rating_count#402, about_product#403, user_id#404, user_name#405, review_id#406, review_title#407, review_content#408, img_link#409, product_link#410]
+                                                   +- LogicalRDD [product_id#395, product_name#396, category#397, discounted_price#398, actual_price#399, discount_percentage#400, rating#401, rating_count#402, about_product#403, user_id#404, user_name#405, review_id#406, review_title#407, review_content#408, img_link#409, product_link#410], false
+
+24/02/13 06:26:30 INFO BlockManagerInfo: Removed broadcast_3_piece0 on 172.38.1.39:37923 in memory (size: 39.3 KiB, free: 5.8 GiB)
+24/02/13 06:26:29 INFO FileSourceScanExec: relation: None, fileSplitsInPartitionHistogram: Vector((1 fileSplits,1))
+24/02/13 06:26:29 INFO FileSourceScanExec: Planning scan with bin packing, max size: 4194304 bytes, open cost is considered as scanning 4194304 bytes, number of split files: 1, prefetch: true
+24/02/13 06:26:29 INFO SparkContext: Created broadcast 4 from rdd at DynamicFrame.scala:2090
+24/02/13 06:26:29 INFO BlockManagerInfo: Added broadcast_4_piece0 in memory on 172.38.1.39:37923 (size: 39.3 KiB, free: 5.8 GiB)
+24/02/13 06:26:29 INFO MemoryStore: Block broadcast_4_piece0 stored as bytes in memory (estimated size 39.3 KiB, free 5.8 GiB)
+24/02/13 06:26:29 INFO MemoryStore: Block broadcast_4 stored as values in memory (estimated size 405.9 KiB, free 5.8 GiB)
+24/02/13 06:26:29 INFO FileSourceStrategy: Output Data Schema: struct<product_id: string, product_name: string, category: string, discounted_price: double, actual_price: double ... 14 more fields>
+24/02/13 06:26:29 INFO FileSourceStrategy: Post-Scan Filters: 
+24/02/13 06:26:29 INFO FileSourceStrategy: Pushed Filters: 
+24/02/13 06:26:29 INFO SparkContext: Created broadcast 3 from rdd at PartitioningStrategy.scala:33
+24/02/13 06:26:29 INFO BlockManagerInfo: Added broadcast_3_piece0 in memory on 172.38.1.39:37923 (size: 39.3 KiB, free: 5.8 GiB)
+24/02/13 06:26:29 INFO MemoryStore: Block broadcast_3_piece0 stored as bytes in memory (estimated size 39.3 KiB, free 5.8 GiB)
+24/02/13 06:26:29 INFO MemoryStore: Block broadcast_3 stored as values in memory (estimated size 405.9 KiB, free 5.8 GiB)
+24/02/13 06:26:29 INFO CodeGenerator: Code generated in 248.751652 ms
+24/02/13 06:26:28 INFO FileSourceStrategy: Output Data Schema: struct<product_id: string, product_name: string, category: string, discounted_price: double, actual_price: double ... 14 more fields>
+24/02/13 06:26:28 INFO FileSourceStrategy: Post-Scan Filters: 
+24/02/13 06:26:28 INFO FileSourceStrategy: Pushed Filters: 
+24/02/13 06:26:27 INFO BlockManagerMasterEndpoint: Registering block manager 172.38.24.132:38351 with 5.8 GiB RAM, BlockManagerId(9, 172.38.24.132, 38351, None)
+24/02/13 06:26:27 INFO ExecutorEventListener: Got executor added event for 9 @ 1707805587106
+24/02/13 06:26:27 INFO ExecutorTaskManagement: connected executor 9
+24/02/13 06:26:27 INFO JESSchedulerBackend$JESAsSchedulerBackendEndpoint: Registered executor NettyRpcEndpointRef(spark-client://Executor) (172.38.24.132:44560) with ID 9,  ResourceProfileId 0
+24/02/13 06:26:26 INFO BlockManagerInfo: Removed broadcast_2_piece0 on 172.34.45.22:44081 in memory (size: 41.0 KiB, free: 5.8 GiB)
+24/02/13 06:26:26 INFO BlockManagerInfo: Removed broadcast_2_piece0 on 172.38.1.39:37923 in memory (size: 41.0 KiB, free: 5.8 GiB)
+24/02/13 06:26:26 INFO BlockManagerMasterEndpoint: Registering block manager 172.35.178.125:32821 with 5.8 GiB RAM, BlockManagerId(5, 172.35.178.125, 32821, None)
+24/02/13 06:26:26 INFO ExecutorEventListener: Got executor added event for 5 @ 1707805586230
+24/02/13 06:26:26 INFO ExecutorTaskManagement: connected executor 5
+24/02/13 06:26:26 INFO JESSchedulerBackend$JESAsSchedulerBackendEndpoint: Registered executor NettyRpcEndpointRef(spark-client://Executor) (172.35.178.125:57444) with ID 5,  ResourceProfileId 0
+24/02/13 06:26:26 INFO DAGScheduler: Job 0 finished: resolveRelation at DataSource.scala:799, took 10.493393 s
+24/02/13 06:26:26 INFO TaskSchedulerImpl: Killing all running tasks in stage 0: Stage finished
+24/02/13 06:26:26 INFO DAGScheduler: Job 0 is finished. Cancelling potential speculative or zombie tasks for this job
+24/02/13 06:26:26 INFO DAGScheduler: ResultStage 0 (resolveRelation at DataSource.scala:799) finished in 10.411 s
+24/02/13 06:26:26 INFO TaskSchedulerImpl: Removed TaskSet 0.0, whose tasks have all completed, from pool 
+24/02/13 06:26:26 INFO TaskSetManager: Finished task 0.0 in stage 0.0 (TID 0) in 5150 ms on 172.34.45.22 (executor 1) (1/1)
+24/02/13 06:26:23 INFO BlockManagerMasterEndpoint: Registering block manager 172.35.37.3:35497 with 5.8 GiB RAM, BlockManagerId(2, 172.35.37.3, 35497, None)
+24/02/13 06:26:23 INFO ExecutorTaskManagement: connected executor 2
+24/02/13 06:26:23 INFO ExecutorEventListener: Got executor added event for 2 @ 1707805583432
+24/02/13 06:26:23 INFO JESSchedulerBackend$JESAsSchedulerBackendEndpoint: Registered executor NettyRpcEndpointRef(spark-client://Executor) (172.35.37.3:52264) with ID 2,  ResourceProfileId 0
+24/02/13 06:26:22 INFO BlockManagerMasterEndpoint: Registering block manager 172.39.222.188:46343 with 5.8 GiB RAM, BlockManagerId(7, 172.39.222.188, 46343, None)
+24/02/13 06:26:22 INFO ExecutorTaskManagement: connected executor 7
+24/02/13 06:26:22 INFO JESSchedulerBackend$JESAsSchedulerBackendEndpoint: Registered executor NettyRpcEndpointRef(spark-client://Executor) (172.39.222.188:37366) with ID 7,  ResourceProfileId 0
+24/02/13 06:26:22 INFO ExecutorEventListener: Got executor added event for 7 @ 1707805582365
+24/02/13 06:26:22 INFO BlockManagerMasterEndpoint: Registering block manager 172.38.10.41:38293 with 5.8 GiB RAM, BlockManagerId(3, 172.38.10.41, 38293, None)
+24/02/13 06:26:21 INFO ExecutorTaskManagement: connected executor 3
+24/02/13 06:26:21 INFO ExecutorEventListener: Got executor added event for 3 @ 1707805581989
+24/02/13 06:26:21 INFO JESSchedulerBackend$JESAsSchedulerBackendEndpoint: Registered executor NettyRpcEndpointRef(spark-client://Executor) (172.38.10.41:50672) with ID 3,  ResourceProfileId 0
+24/02/13 06:26:21 INFO BlockManagerInfo: Added broadcast_2_piece0 in memory on 172.34.45.22:44081 (size: 41.0 KiB, free: 5.8 GiB)
+24/02/13 06:26:21 INFO BlockManagerMasterEndpoint: Registering block manager 172.36.222.194:41959 with 5.8 GiB RAM, BlockManagerId(8, 172.36.222.194, 41959, None)
+24/02/13 06:26:21 INFO BlockManagerMasterEndpoint: Registering block manager 172.38.128.182:45127 with 5.8 GiB RAM, BlockManagerId(6, 172.38.128.182, 45127, None)
+24/02/13 06:26:20 INFO ExecutorTaskManagement: connected executor 8
+24/02/13 06:26:20 INFO ExecutorEventListener: Got executor added event for 8 @ 1707805580996
+24/02/13 06:26:20 INFO JESSchedulerBackend$JESAsSchedulerBackendEndpoint: Registered executor NettyRpcEndpointRef(spark-client://Executor) (172.36.222.194:56686) with ID 8,  ResourceProfileId 0
+24/02/13 06:26:20 INFO ExecutorTaskManagement: connected executor 6
+24/02/13 06:26:20 INFO ExecutorEventListener: Got executor added event for 6 @ 1707805580930
+24/02/13 06:26:20 INFO JESSchedulerBackend$JESAsSchedulerBackendEndpoint: Registered executor NettyRpcEndpointRef(spark-client://Executor) (172.38.128.182:55038) with ID 6,  ResourceProfileId 0
+24/02/13 06:26:20 INFO TaskSetManager: Starting task 0.0 in stage 0.0 (TID 0) (172.34.45.22, executor 1, partition 0, PROCESS_LOCAL, 4616 bytes) taskResourceAssignments Map()
+24/02/13 06:26:20 INFO BlockManagerMasterEndpoint: Registering block manager 172.36.109.129:34713 with 5.8 GiB RAM, BlockManagerId(4, 172.36.109.129, 34713, None)
+24/02/13 06:26:20 INFO BlockManagerMasterEndpoint: Registering block manager 172.34.45.22:44081 with 5.8 GiB RAM, BlockManagerId(1, 172.34.45.22, 44081, None)
+24/02/13 06:26:20 INFO ExecutorEventListener: Got executor added event for 4 @ 1707805580735
+24/02/13 06:26:20 INFO ExecutorTaskManagement: connected executor 4
+24/02/13 06:26:20 INFO ExecutorTaskManagement: connected executor 1
+24/02/13 06:26:20 INFO ExecutorEventListener: Got executor added event for 1 @ 1707805580733
+24/02/13 06:26:20 INFO JESSchedulerBackend$JESAsSchedulerBackendEndpoint: Registered executor NettyRpcEndpointRef(spark-client://Executor) (172.36.109.129:58646) with ID 4,  ResourceProfileId 0
+24/02/13 06:26:20 INFO JESSchedulerBackend$JESAsSchedulerBackendEndpoint: Registered executor NettyRpcEndpointRef(spark-client://Executor) (172.34.45.22:36362) with ID 1,  ResourceProfileId 0
+24/02/13 06:26:15 INFO TaskSchedulerImpl: Adding task set 0.0 with 1 tasks resource profile 0
+24/02/13 06:26:15 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 0 (MapPartitionsRDD[1] at resolveRelation at DataSource.scala:799) (first 15 tasks are for partitions Vector(0))
+24/02/13 06:26:15 INFO SparkContext: Created broadcast 2 from broadcast at DAGScheduler.scala:1570
+24/02/13 06:26:15 INFO BlockManagerInfo: Added broadcast_2_piece0 in memory on 172.38.1.39:37923 (size: 41.0 KiB, free: 5.8 GiB)
+24/02/13 06:26:15 INFO MemoryStore: Block broadcast_2_piece0 stored as bytes in memory (estimated size 41.0 KiB, free 5.8 GiB)
+24/02/13 06:26:15 INFO MemoryStore: Block broadcast_2 stored as values in memory (estimated size 112.3 KiB, free 5.8 GiB)
+24/02/13 06:26:15 INFO DAGScheduler: Submitting ResultStage 0 (MapPartitionsRDD[1] at resolveRelation at DataSource.scala:799), which has no missing parents
+24/02/13 06:26:15 INFO DAGScheduler: Missing parents: List()
+24/02/13 06:26:15 INFO DAGScheduler: Parents of final stage: List()
+24/02/13 06:26:15 INFO DAGScheduler: Final stage: ResultStage 0 (resolveRelation at DataSource.scala:799)
+24/02/13 06:26:15 INFO DAGScheduler: Got job 0 (resolveRelation at DataSource.scala:799) with 1 output partitions
+24/02/13 06:26:15 INFO SparkContext: Starting job: resolveRelation at DataSource.scala:799
+24/02/13 06:26:13 INFO SharedState: Warehouse path is 'file:/tmp/spark-warehouse'.
+24/02/13 06:26:13 INFO SharedState: spark.sql.warehouse.dir is not set, but hive.metastore.warehouse.dir is set. Setting spark.sql.warehouse.dir to the value of hive.metastore.warehouse.dir.
+24/02/13 06:26:13 INFO PartitionFilesListerUsingBookmark: After initial job bookmarks filter, processing 100.00% of 1 files in partition DynamicFramePartition(com.amazonaws.services.glue.DynamicRecord@a0139eb8,s3://amazonsales-capstone-sk/cleanedfiles/,0).
+24/02/13 06:26:12 INFO PartitionFilesListerUsingBookmark: last job run range: low inconsistency range begin: 1970-01-01T00:00:00Z, 
+ job run range begin: 1970-01-01T00:00:00Z, 
+ high inconsistency range begin: 2024-02-13T06:11:12.124Z, 
+ job run range end: 2024-02-13T06:26:12.124Z
+24/02/13 06:26:12 INFO PartitionFilesListerUsingBookmark: newPartitionFilter(partitionCreationEpoch=0, oldPartitions=Set())
+24/02/13 06:26:12 INFO PartitionFilesListerUsingBookmark: UnprocessedPartitionFilter(partitionCreationEpoch=0, oldPartitions=Set())
+24/02/13 06:26:12 INFO PartitionFilesListerUsingBookmark: IncompletePartitionFilter(partitionCreationEpoch=0, incompletePartition=)
+24/02/13 06:26:11 INFO BlockManagerInfo: Removed broadcast_0_piece0 on 172.38.1.39:37923 in memory (size: 33.7 KiB, free: 5.8 GiB)
+24/02/13 06:26:11 INFO BlockManagerInfo: Removed broadcast_1_piece0 on 172.38.1.39:37923 in memory (size: 33.7 KiB, free: 5.8 GiB)
+24/02/13 06:26:11 INFO GlueContext: The DataSource in action : com.amazonaws.services.glue.SparkSQLDataSource
+24/02/13 06:26:11 INFO GlueContext: Glue secret manager integration: secretId is not provided.
+24/02/13 06:26:11 INFO GlueContext: No of partitions from catalog are 0.  consider catalogPartitionPredicate to reduce the number of partitions to scan through
+24/02/13 06:26:11 INFO GlueContext: classification parquet
+24/02/13 06:26:11 INFO GlueContext: getCatalogSource: transactionId: <not-specified> asOfTime: <not-specified> catalogPartitionIndexPredicate: <not-specified> 
+24/02/13 06:26:11 INFO GlueContext: getCatalogSource: catalogId: null, nameSpace: amazonsales-sk-capstone, tableName: cleanedfiles, isRegisteredWithLF: false, isGoverned: false, isRowFilterEnabled: false, useAdvancedFiltering: false
+24/02/13 06:26:11 INFO SparkContext: Created broadcast 1 from broadcast at DynamoConnection.scala:52
+24/02/13 06:26:11 INFO BlockManagerInfo: Added broadcast_1_piece0 in memory on 172.38.1.39:37923 (size: 33.7 KiB, free: 5.8 GiB)
+24/02/13 06:26:11 INFO MemoryStore: Block broadcast_1_piece0 stored as bytes in memory (estimated size 33.7 KiB, free 5.8 GiB)
+24/02/13 06:26:11 INFO MemoryStore: Block broadcast_1 stored as values in memory (estimated size 362.0 KiB, free 5.8 GiB)
+24/02/13 06:26:11 INFO SparkContext: Created broadcast 0 from broadcast at DynamoConnection.scala:52
+24/02/13 06:26:11 INFO BlockManagerInfo: Added broadcast_0_piece0 in memory on 172.38.1.39:37923 (size: 33.7 KiB, free: 5.8 GiB)
+24/02/13 06:26:11 INFO MemoryStore: Block broadcast_0_piece0 stored as bytes in memory (estimated size 33.7 KiB, free 5.8 GiB)
+24/02/13 06:26:10 INFO MemoryStore: Block broadcast_0 stored as values in memory (estimated size 362.0 KiB, free 5.8 GiB)
+24/02/13 06:26:10 INFO AvroReaderUtil$: Creating default Avro field parser for version 1.7.
+24/02/13 06:26:10 INFO LakeformationRetryWrapper$: Lakeformation: API call succeeded
+24/02/13 06:26:10 INFO TaskGroupInterface: createChildTask API response code 200
+24/02/13 06:26:10 INFO ExecutorTaskManagement: executor task g-e25279e45081b364448fcceab1474b36920822f5 created for executor 9
+24/02/13 06:26:10 INFO AWSConnectionUtils$: AWSConnectionUtils: use proxy in glue client configuration. Host: null, Port: -1
+24/02/13 06:26:10 INFO ExecutorTaskManagement: executor task g-c438d2d955083512ca5f3df73e64d8b54e1622c0 created for executor 8
+24/02/13 06:26:10 INFO TaskGroupInterface: creating executor task for executor 9; clientToken gr_tg-6f92118fcb7b3ed0a6d2ee763d943e86ba208880_e_9_a_spark-application-1707805567813
+24/02/13 06:26:10 INFO LzoCodec: Successfully loaded & initialized native-lzo library [hadoop-lzo rev 049362b7cf53ff5f739d6b1532457f2c6cd495e8]
+24/02/13 06:26:10 INFO GPLNativeCodeLoader: Loaded native gpl library
+24/02/13 06:26:10 INFO ObservabilityTaskInfoRecorderListener: PerformanceMetricsSource is initiated
+24/02/13 06:26:10 INFO GlueContext: ObservabilityMetrics configured and enabled
+24/02/13 06:26:10 INFO StageSkewness: [Observability] Skewness metric using Skewness Factor = 5
+24/02/13 06:26:10 INFO ObservabilityTaskInfoRecorderListener: ResourceUtilizationMetricsSource is initiated
+24/02/13 06:26:10 INFO ObservabilityTaskInfoRecorderListener: ThroughputMetricsSource is initiated
+24/02/13 06:26:10 INFO GlueContext: GlueMetrics configured and enabled
+24/02/13 06:26:10 INFO ExecutorTaskManagement: executor task g-bd8eb3ae7ce95eabc86bcaa853ae8b9614f530f2 created for executor 7
+24/02/13 06:26:10 INFO TaskGroupInterface: creating executor task for executor 8; clientToken gr_tg-6f92118fcb7b3ed0a6d2ee763d943e86ba208880_e_8_a_spark-application-1707805567813
+24/02/13 06:26:09 INFO ExecutorTaskManagement: executor task g-76185065eeaeb70738144468b784bdb1314ac4ed created for executor 6
+24/02/13 06:26:09 INFO TaskGroupInterface: creating executor task for executor 7; clientToken gr_tg-6f92118fcb7b3ed0a6d2ee763d943e86ba208880_e_7_a_spark-application-1707805567813
+24/02/13 06:26:09 INFO TaskGroupInterface: createChildTask API response code 200
+24/02/13 06:26:09 INFO TaskGroupInterface: creating executor task for executor 6; clientToken gr_tg-6f92118fcb7b3ed0a6d2ee763d943e86ba208880_e_6_a_spark-application-1707805567813
+24/02/13 06:26:09 INFO ExecutorTaskManagement: executor task g-ba8ce99eb9ec05fd6f1f05a45c0b973c96f51add created for executor 5
+24/02/13 06:26:09 INFO ExecutorTaskManagement: executor task g-7797b8402f5eb9270790014ca57180df64dc3e16 created for executor 4
+24/02/13 06:26:09 INFO TaskGroupInterface: creating executor task for executor 5; clientToken gr_tg-6f92118fcb7b3ed0a6d2ee763d943e86ba208880_e_5_a_spark-application-1707805567813
+24/02/13 06:26:09 INFO TaskGroupInterface: creating executor task for executor 4; clientToken gr_tg-6f92118fcb7b3ed0a6d2ee763d943e86ba208880_e_4_a_spark-application-1707805567813
+24/02/13 06:26:09 INFO ExecutorTaskManagement: executor task g-75cd51ca78514f44a4596c7b7c63af37f824ce20 created for executor 3
+24/02/13 06:26:09 INFO JESSchedulerBackend: SchedulerBackend is ready for scheduling beginning after reached minRegisteredResourcesRatio: 0.0
+24/02/13 06:26:09 INFO log: Logging initialized @12760ms to org.sparkproject.jetty.util.log.Slf4jLog
+24/02/13 06:26:08 INFO TaskGroupInterface: createChildTask API response code 200
+24/02/13 06:26:08 INFO ExecutorTaskManagement: executor task g-9cb584b911107623528d3ecf219261f8b4f57925 created for executor 2
+24/02/13 06:26:08 INFO TaskGroupInterface: creating executor task for executor 3; clientToken gr_tg-6f92118fcb7b3ed0a6d2ee763d943e86ba208880_e_3_a_spark-application-1707805567813
+24/02/13 06:26:08 INFO SingleEventLogFileWriter: Logging events to file:/tmp/spark-event-logs/spark-application-1707805567813.inprogress
+24/02/13 06:26:08 INFO TaskGroupInterface: creating executor task for executor 2; clientToken gr_tg-6f92118fcb7b3ed0a6d2ee763d943e86ba208880_e_2_a_spark-application-1707805567813
+24/02/13 06:26:08 INFO ExecutorTaskManagement: executor task g-a8d059adb9b12f0620b5d1c2b29210bb2e7d0ae7 created for executor 1
+24/02/13 06:26:08 INFO GlueCloudwatchSink: CloudwatchSink: jobName: amazonsales-sk-job jobRunId: jr_cf88b9abea1546f32d1b3eff2167629a39401e4471ebf33e3871e8a1bc593a12
+24/02/13 06:26:08 INFO GlueCloudwatchSink: CloudwatchSink: Obtained credentials from the Instance Profile
+24/02/13 06:26:08 INFO GlueCloudwatchSink: GlueCloudwatchSink: get cloudwatch client using proxy: host null, port -1
+24/02/13 06:26:08 INFO BlockManager: Initialized BlockManager: BlockManagerId(driver, 172.38.1.39, 37923, None)
+24/02/13 06:26:08 INFO BlockManagerMaster: Registered BlockManager BlockManagerId(driver, 172.38.1.39, 37923, None)
+24/02/13 06:26:08 INFO BlockManagerMasterEndpoint: Registering block manager 172.38.1.39:37923 with 5.8 GiB RAM, BlockManagerId(driver, 172.38.1.39, 37923, None)
+24/02/13 06:26:08 INFO BlockManagerMaster: Registering BlockManager BlockManagerId(driver, 172.38.1.39, 37923, None)
+24/02/13 06:26:08 INFO BlockManager: Using org.apache.spark.storage.RandomBlockReplicationPolicy for block replication policy
+24/02/13 06:26:08 INFO NettyBlockTransferService: Server created on 172.38.1.39:37923
+24/02/13 06:26:08 INFO Utils: Successfully started service 'org.apache.spark.network.netty.NettyBlockTransferService' on port 37923.
+24/02/13 06:26:08 INFO TaskGroupInterface: creating executor task for executor 1; clientToken gr_tg-6f92118fcb7b3ed0a6d2ee763d943e86ba208880_e_1_a_spark-application-1707805567813
+24/02/13 06:26:08 INFO JESSchedulerBackend: JESClusterManager: Initializing JES client with proxy: host: null, port: -1
+24/02/13 06:26:08 INFO JESSchedulerBackend: JESSchedulerBackend
+24/02/13 06:26:07 INFO JESSchedulerBackend$JESAsSchedulerBackendEndpoint: JESAsSchedulerBackendEndpoint
+24/02/13 06:26:07 INFO SubResultCacheManager: Sub-result caches are disabled.
+24/02/13 06:26:07 INFO SparkEnv: Registering OutputCommitCoordinator
+24/02/13 06:26:07 INFO MemoryStore: MemoryStore started with capacity 5.8 GiB
+24/02/13 06:26:07 INFO DiskBlockManager: Created local directory at /tmp/blockmgr-9c88337a-a989-42e0-9bc1-0518d9f177d3
+24/02/13 06:26:07 INFO SparkEnv: Registering BlockManagerMasterHeartbeat
+24/02/13 06:26:07 INFO BlockManagerMasterEndpoint: BlockManagerMasterEndpoint up
+24/02/13 06:26:07 INFO BlockManagerMasterEndpoint: Using org.apache.spark.storage.DefaultTopologyMapper for getting topology information
+24/02/13 06:26:07 INFO SparkEnv: Registering BlockManagerMaster
+24/02/13 06:26:07 INFO SparkEnv: Registering MapOutputTracker
+24/02/13 06:26:07 INFO Utils: Successfully started service 'sparkDriver' on port 33523.
+24/02/13 06:26:07 INFO SecurityManager: SecurityManager: authentication enabled; ui acls disabled; users  with view permissions: Set(spark); groups with view permissions: Set(); users  with modify permissions: Set(spark); groups with modify permissions: Set()
+24/02/13 06:26:07 INFO SecurityManager: Changing view acls groups to: 
+24/02/13 06:26:07 INFO SecurityManager: Changing modify acls groups to: 
+24/02/13 06:26:07 INFO SecurityManager: Changing modify acls to: spark
+24/02/13 06:26:07 INFO SecurityManager: Changing view acls to: spark
+24/02/13 06:26:07 INFO ResourceProfileManager: Added ResourceProfile id: 0
+24/02/13 06:26:07 INFO ResourceProfile: Limiting resource is cpus at 4 tasks per executor
+24/02/13 06:26:07 INFO ResourceProfile: Default ResourceProfile created, executor resources: Map(cores -> name: cores, amount: 4, script: , vendor: , memory -> name: memory, amount: 10240, script: , vendor: , offHeap -> name: offHeap, amount: 0, script: , vendor: ), task resources: Map(cpus -> name: cpus, amount: 1.0)
+24/02/13 06:26:07 INFO SparkContext: Submitted application: nativespark-amazonsales-sk-job-jr_cf88b9abea1546f32d1b3eff2167629a39401e4471ebf33e3871e8a1bc593a12
+24/02/13 06:26:07 INFO ResourceUtils: No custom resources configured for spark.driver.
+24/02/13 06:26:07 INFO ResourceUtils: ==============================================================
+24/02/13 06:26:07 INFO SparkContext: Running Spark version 3.3.0-amzn-1
+24/02/13 06:26:01 INFO SafeLogging: Initializing logging subsystem
+24/02/13 06:26:00 INFO PlatformInfo: Unable to read clusterId from /var/lib/instance-controller/extraInstanceData.json, trying EMR job-flow data file: /var/lib/info/job-flow.json
+24/02/13 06:26:00 INFO PlatformInfo: Unable to read clusterId from /var/lib/info/job-flow.json, out of places to look
+24/02/13 06:26:00 INFO PlatformInfo: Unable to read clusterId from http://localhost:8321/configuration, trying extra instance data file: /var/lib/instance-controller/extraInstanceData.json
+24/02/13 06:25:59 INFO LogPusher: legacyLogging: true - logs will be written with spark application ID
+24/02/13 06:25:59 INFO LogPusher: standardLogging: true - logs will be written with job run ID or session ID
