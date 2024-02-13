@@ -1,3 +1,5 @@
+Error Category: QUERY_ERROR; AnalysisException: Union can only be performed on tables with the same number of columns, but the first table has 16 columns and the third table has 17 columns;
+
 error fr above code u provided Error Category: QUERY_ERROR; AnalysisException: Union can only be performed on tables with the same number of columns, but the first table has 16 columns and the third table has 17 columns;
 24/02/13 06:26:31 INFO LogPusher: stopping
 24/02/13 06:26:31 INFO CloudWatchMetricsEmitter: Emit job error metrics
