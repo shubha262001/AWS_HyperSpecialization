@@ -1,7 +1,7 @@
 from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, translate, expr, count, lit
+from pyspark.sql.functions import col, translate, expr, count
 from awsglue.dynamicframe import DynamicFrame
 from awsglue.utils import getResolvedOptions
 import sys
@@ -84,20 +84,14 @@ df_with_bad_review_percentage = df_cleaned.withColumn("bad_review_percentage", (
 
 df_ranked_by_rating_count = df_cleaned.withColumn("rank", expr("rank() over (order by rating_count desc)"))
 
-# Add dummy column to DataFrames with fewer columns
-missing_columns = set(df_original.columns) - set(df_above_4.columns)
-for column in missing_columns:
-    df_above_4 = df_above_4.withColumn(column, lit(None))
+# Ensure all DataFrames have the same number of columns
+num_columns = df_cleaned.columns
+df_above_4 = df_above_4.select(*num_columns)
+df_above_4_below_3 = df_above_4_below_3.select(*num_columns)
+df_with_bad_review_percentage = df_with_bad_review_percentage.select(*num_columns)
+df_ranked_by_rating_count = df_ranked_by_rating_count.select(*num_columns)
 
-missing_columns = set(df_original.columns) - set(df_above_4_below_3.columns)
-for column in missing_columns:
-    df_above_4_below_3 = df_above_4_below_3.withColumn(column, lit(None))
-
-missing_columns = set(df_original.columns) - set(df_with_bad_review_percentage.columns)
-for column in missing_columns:
-    df_with_bad_review_percentage = df_with_bad_review_percentage.withColumn(column, lit(None))
-
-# Combine all DataFrames into a single DataFrame
+# Combine DataFrames using union
 final_df = df_above_4.union(df_above_4_below_3).union(df_with_bad_review_percentage).union(df_ranked_by_rating_count)
 
 # Repartition the DataFrame to a single partition
@@ -105,4 +99,3 @@ final_df_single_partition = final_df.repartition(1)
 
 # Write results to S3 as a single Parquet file
 final_df_single_partition.write.parquet(s3_output_path, mode="overwrite")
-
