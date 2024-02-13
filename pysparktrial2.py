@@ -38,16 +38,13 @@ cleaned_data = cleaned_data.withColumn("category_struct", struct(split_category[
     .drop("category")
 
 ## Calculate percentages of bad reviews at the product level
-bad_reviews_percentage = (F.sum(F.when(cleaned_data['rating'] < 3.0, 1).otherwise(0)) / F.count('*') * 100).alias('bad_reviews_percentage')
-cleaned_data = cleaned_data.withColumn('bad_reviews_percentage', bad_reviews_percentage)
+cleaned_data = cleaned_data.withColumn('bad_reviews_percentage', (F.sum(F.when(cleaned_data['rating'] < 3.0, 1).otherwise(0)) / F.count('*') * 100))
 
 ## Identify products with overall ratings above 4.0
-above_4_ratings = F.when(cleaned_data['rating'] > 4.0, True).otherwise(False).alias('above_4_ratings')
-cleaned_data = cleaned_data.withColumn('above_4_ratings', above_4_ratings)
+cleaned_data = cleaned_data.withColumn('above_4_ratings', (cleaned_data['rating'] > 4.0).cast('boolean'))
 
 ## Identify products with ratings both above 4.0 and below 3.0
-above_4_below_3 = F.when((cleaned_data['rating'] > 4.0) | (cleaned_data['rating'] < 3.0), True).otherwise(False).alias('above_4_below_3')
-cleaned_data = cleaned_data.withColumn('above_4_below_3', above_4_below_3)
+cleaned_data = cleaned_data.withColumn('above_4_below_3', ((cleaned_data['rating'] > 4.0) | (cleaned_data['rating'] < 3.0)).cast('boolean'))
 
 ## Establish product hierarchy by identifying top performers
 top_performers = cleaned_data\
