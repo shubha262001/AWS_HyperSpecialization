@@ -1,8 +1,8 @@
+Error Category: QUERY_ERROR; AnalysisException: Can't extract value from category#37: need struct type but got string
+
+
+
 Error Category: QUERY_ERROR; AnalysisException: Found duplicate column(s) when inserting into s3://amazonsales-capstone-sk/transformed: `about_product`, `actual_price`, `category_layer_1`, `category_layer_2`, `category_layer_3`, `category_layer_4`, `category_layer_5`, `discount_percentage`, `discounted_price`, `overall_rating`, `rating_count`
-
-
-
-
 
 Error Category: QUERY_ERROR; Spark Error Class: MISSING_COLUMN; AnalysisException: Column 'discount_percentage' does not exist. Did you mean one of the following? [];
 
