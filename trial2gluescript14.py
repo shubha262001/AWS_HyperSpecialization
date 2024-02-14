@@ -70,4 +70,3 @@ df_cleaned = df_cleaned.withColumn("rank", when(col("rating_count") > 4, 1).othe
 
 # Write results to S3 as a single Parquet file
 df_cleaned.coalesce(1).write.parquet(s3_output_path, mode="overwrite")
-
