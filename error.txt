@@ -1,3 +1,7 @@
+Error Category: QUERY_ERROR; Spark Error Class: MISSING_COLUMN; AnalysisException: Column '`discounted_price(₹)`' does not exist. Did you mean one of the following? [];
+Error Category: SYNTAX_ERROR; SyntaxError: invalid syntax. Perhaps you forgot a comma? (amazonsales-sk-job.py, line 103)
+
+
 Error Category: QUERY_ERROR; Spark Error Class: MISSING_COLUMN; AnalysisException: Column 'B09P182Z2H' does not exist. Did you mean one of the following? [brandname, category, img_link, product_id, rank, rating, review_id, user_id, user_name, 3to4_rating, product_link, product_name, rating_count, review_title, about_product, above_4_rating, review_content, actual_price(₹), discount_percentage, discounted_price(₹), bad_review_percentage]; line 1 pos 18;
 
 Error Category: INVALID_ARGUMENT_ERROR; NameError: name 'when' is not defined
