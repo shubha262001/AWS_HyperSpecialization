@@ -1,3 +1,23 @@
+{
+  "product_id": "B08MVSGXMY",
+  "product_name": "Crompton Insta Comfy 800 Watt Room Heater with 2 Heat Settings(Grey Blue)",
+  "discounted_price(₹)": 1498,
+  "actual_price(₹)": 2300,
+  "discount_percentage": 35,
+  "rating": "3.8",
+  "rating_count": "95",
+  "about_product": "The advanced quartz tubes get quickly heated and its dual heat setting features allow you to adjust the temperature as per your comfort|Fused with elegant and sleek design that goes well with your décor|High efficient quick heating quartz rod with two setting 400W+400W|Rust free stainless steel reflector, along with Tip-Over proctection for a safer experience|An ISI approved product powered with shock proof body and a carrying handle|Power Requirement - 200-220E 50HZ 800W, Two Settings 400W+400W|Warranty: 1 years warranty provided by crompton from date of purchase, covers on manufacturing defects kindly read the usermanual for more details",
+  "category_layer_1": "H",
+  "category_layer_2": "o",
+  "category_layer_3": "m",
+  "category_layer_4": "e",
+  "category_layer_5": "&",
+  "top_performer": 1
+}
+
+
+
+
 Error Category: UNCLASSIFIED_ERROR; TypeError: 'Column' object is not callable
 Error Category: UNCLASSIFIED_ERROR; TypeError: 'Column' object is not callable
 
