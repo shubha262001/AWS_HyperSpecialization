@@ -1,35 +1,83 @@
-from awsglue.context import GlueContext
-from awsglue.job import Job
+import sys
 from pyspark.context import SparkContext
+from awsglue.context import GlueContext
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, when, split, regexp_replace
+from pyspark.sql.functions import col, translate, expr, count, desc, split, substring
+from awsglue.dynamicframe import DynamicFrame
+from awsglue.utils import getResolvedOptions
+from pyspark.sql.window import Window
+from pyspark.sql.types import IntegerType, FloatType
 
-# Create a GlueContext
+# Create a SparkContext
 sc = SparkContext()
 glueContext = GlueContext(sc)
 spark = glueContext.spark_session
 
-# Define the source and target paths
+# Get job arguments
+args = getResolvedOptions(sys.argv, ['JOB_NAME'])
+
+# Define source and target paths
 s3_input_path = "s3://amazonsales-capstone-sk/cleanedfiles"
 s3_output_path = "s3://amazonsales-capstone-sk/transformed/"
 
-# Read the CSV file into a DataFrame
-df = spark.read.csv(s3_input_path, header=True, inferSchema=True)
+# Read data from S3
+dynamic_frame = glueContext.create_dynamic_frame.from_catalog(database="amazonsales-sk-capstone", table_name="cleanedfiles", transformation_ctx="dynamic_frame")
 
-# Drop unnecessary columns
-drop_columns = ["user_id", "user_name", "review_id", "review_title", "review_content", "img_link", "product_link", "about_product"]
-df = df.drop(*drop_columns)
+# Convert DynamicFrame to DataFrame
+df_original = dynamic_frame.toDF()
 
-# Convert the 'rating' column to numeric type
-df = df.withColumn("rating", col("rating").cast("float"))
+# Function to remove symbols from column values
+def remove_symbols(column):
+    return translate(column, "₹,%", "")
 
-# Calculate above_4_rating and 3to4_rating at the row level
-df = df.withColumn("above_4_rating", when(col("rating") > 4.0, 1).otherwise(0))
-df = df.withColumn("3to4_rating", when((col("rating") >= 3.0) & (col("rating") <= 4.0), 1).otherwise(0))
+# Function to change column names and remove symbols
+def rename_and_clean_columns(df):
+    df = df.withColumnRenamed("discounted_price", "discounted_price(₹)") \
+           .withColumnRenamed("actual_price", "actual_price(₹)") \
+           .withColumn("discounted_price(₹)", remove_symbols(col("discounted_price(₹)"))) \
+           .withColumn("actual_price(₹)", remove_symbols(col("actual_price(₹)")))
+    df = df.withColumn("discounted_price(₹)", df["discounted_price(₹)"].cast(IntegerType())) \
+           .withColumn("actual_price(₹)", df["actual_price(₹)"].cast(IntegerType()))
+    return df
+
+# Function to remove % symbol from discount_percentage column
+def clean_discount_percentage(df):
+    df = df.withColumn("discount_percentage", remove_symbols(col("discount_percentage"))) \
+           .withColumn("discount_percentage", col("discount_percentage").cast(FloatType()))
+    return df
+
+# Function to replace null values with 'N.A.'
+def replace_null_values(df):
+    df = df.fillna("N.A.")
+    return df
+
+# Function to drop duplicate rows based on specified columns
+def drop_duplicate_rows(df):
+    df = df.dropDuplicates(["product_id", "discounted_price(₹)", "actual_price(₹)", "rating", "rating_count"])
+    return df
+
+# Function to change data formats
+def change_data_formats(df):
+    df = df.withColumn("rating", col("rating").cast(FloatType())) \
+           .withColumn("rating_count", remove_symbols(col("rating_count"))) \
+           .withColumn("rating_count", col("rating_count").cast(IntegerType()))
+    return df
+
+# Apply all business logic transformations
+def apply_business_logic(df):
+    df = rename_and_clean_columns(df)
+    df = clean_discount_percentage(df)
+    df = replace_null_values(df)
+    df = drop_duplicate_rows(df)
+    df = change_data_formats(df)
+    return df
+
+# Apply basic data cleaning and transformation operations
+df_cleaned = apply_business_logic(df_original)
 
 # Split the 'category' column into separate columns
-df = df.withColumn("category_levels", split(df["category"], "\\|"))
-df = df.select(
+df_cleaned = df_cleaned.withColumn("category_levels", split("category", "\|"))
+df_cleaned = df_cleaned.select(
     "*",
     col("category_levels")[0].alias("main_category"),
     col("category_levels")[1].alias("sub_category1"),
@@ -38,28 +86,24 @@ df = df.select(
     col("category_levels")[4].alias("sub_category4")
 ).drop("category", "category_levels")
 
-# Clean the 'discounted_price' and 'actual_price' columns
-df = df.withColumn("discounted_price", regexp_replace(col("discounted_price"), "[^0-9]", ""))
-df = df.withColumn("actual_price", regexp_replace(col("actual_price"), "[^0-9]", ""))
+# Calculate the average rating, above_4_rating, and 3to4_rating
+df_cleaned = df_cleaned.withColumn("above_4_rating", ((col("rating") > 4.0).cast(IntegerType())))
+df_cleaned = df_cleaned.withColumn("3to4_rating", (((col("rating") >= 3.0) & (col("rating") <= 4.0)).cast(IntegerType())))
 
-# Calculate bad review percentage
-total_reviews = df.count()
-bad_reviews = df.filter((col("rating") >= 1.0) & (col("rating") < 3.0)).count()
-bad_review_percentage = (bad_reviews / total_reviews) * 100
+# Calculate bad_review_percentage
+windowSpec = Window.partitionBy("product_id")
+df_cleaned = df_cleaned.withColumn("bad_review_percentage", ((count("product_id").over(windowSpec) - 1) / count("product_id").over(windowSpec) * 100).cast(FloatType()))
 
-# Calculate top performers based on the rating count
-top_performers_df = df.groupBy("product_id").agg(
-    sum("above_4_rating").alias("above_4_rating_count"),
-    sum("3to4_rating").alias("3to4_rating_count"),
-    count("rating").alias("rating_count")
-).orderBy(col("above_4_rating_count").desc()).limit(10)
-top_performers_list = top_performers_df.select("product_id").collect()
+# Calculate top performers
+top_performers_list = df_cleaned.groupBy("product_id").count().orderBy(desc("count")).limit(10).select("product_id").collect()
+top_performers_list = [row.product_id for row in top_performers_list]
+df_cleaned = df_cleaned.withColumn("top_performer", col("product_id").isin(top_performers_list).cast(IntegerType()))
 
-# Add a column indicating whether a product is a top performer
-df = df.withColumn("top_performer", when(col("product_id").isin(top_performers_list), 1).otherwise(0))
+# Calculate brand
+df_cleaned = df_cleaned.withColumn("brandname", substring("product_name", 1, 4))
 
-# Extract brand name from 'product_name' column
-df = df.withColumn("brand_name", split(col("product_name"), " ")[0])
+# Repartition the DataFrame to a single partition
+final_df_single_partition = df_cleaned.coalesce(1)
 
-# Write the final DataFrame to a single Parquet file
-df.coalesce(1).write.parquet(s3_output_path, mode="overwrite")
+# Write results to S3 as a single Parquet file
+final_df_single_partition.write.parquet(s3_output_path, mode="overwrite")
