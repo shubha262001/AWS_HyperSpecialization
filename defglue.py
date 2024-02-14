@@ -1,7 +1,7 @@
 from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, split, when, avg, sum, desc
+from pyspark.sql.functions import col, avg, when, sum, desc
 from pyspark.sql.types import FloatType
 
 # Create a GlueContext
@@ -21,13 +21,15 @@ drop_columns = ["user_id", "user_name", "review_id", "review_title", "review_con
 df = df.drop(*drop_columns)
 
 # Split the 'category' column into separate columns
-split_categories = split(df['category'], '\\|')
-df = df.withColumn("main_category", split_categories.getItem(0))
-df = df.withColumn("sub_category1", split_categories.getItem(1))
-df = df.withColumn("sub_category2", split_categories.getItem(2))
-df = df.withColumn("sub_category3", split_categories.getItem(3))
-df = df.withColumn("sub_category4", split_categories.getItem(4))
-df = df.drop("category")
+df = df.withColumn("category_levels", col("category").split("\\|"))
+df = df.select(
+    "*",
+    col("category_levels")[0].alias("main_category"),
+    col("category_levels")[1].alias("sub_category1"),
+    col("category_levels")[2].alias("sub_category2"),
+    col("category_levels")[3].alias("sub_category3"),
+    col("category_levels")[4].alias("sub_category4")
+).drop("category", "category_levels")
 
 # Convert the 'rating' column to numeric type
 df = df.withColumn("rating", df["rating"].cast(FloatType()))
@@ -38,16 +40,20 @@ df = df.withColumn("3to4_rating", when((col("rating") >= 3.0) & (col("rating") <
 
 # Aggregate to get the total rating count for each product
 aggregated_df = df.groupBy("product_id").agg(
-    avg("rating").alias("average_rating"),
+    avg("rating").cast(FloatType()).alias("average_rating"),
     sum("above_4_rating").alias("above_4_rating_count"),
     sum("3to4_rating").alias("3to4_rating_count"),
     sum("rating_count").alias("total_rating_count")
 )
 
 # Calculate bad_review_percentage
-aggregated_df = aggregated_df.withColumn("bad_review_percentage", (sum(when(col("rating") < 3.0, 1).otherwise(0)) / sum("total_rating_count")) * 100)
+bad_review_percentage_df = aggregated_df.withColumn("bad_review_percentage", 
+                                                    (sum(when(col("rating") < 3.0, 1).otherwise(0)) / col("total_rating_count")) * 100)
 
-# Calculate top performers based on the rating count
+# Extract brand from product_name column
+df = df.withColumn("brand", col("product_name").substr(0, col("product_name").instr(" ")))
+
+# Identify top performers
 top_performers_df = aggregated_df.orderBy(desc("above_4_rating_count")).limit(10)
 top_performers_list = top_performers_df.select("product_id").collect()
 
@@ -59,3 +65,4 @@ final_df = df.join(aggregated_df, "product_id").drop("total_rating_count")
 
 # Write the final DataFrame to a single Parquet file
 final_df.coalesce(1).write.parquet(s3_output_path, mode="overwrite")
+
