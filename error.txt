@@ -1,3 +1,10 @@
+# Clean the price columns and rename them
+df['discounted_price(₹)'] = df['discounted_price'].str.replace('[^\d.]', '', regex=True).astype(float)
+df['actual_price(₹)'] = df['actual_price'].str.replace('[^\d.]', '', regex=True).astype(float)
+
+# Drop the original columns
+df = df.drop(columns=['discounted_price', 'actual_price'])
+
 Error Category: QUERY_ERROR; Spark Error Class: MISSING_COLUMN; AnalysisException: Column '`discounted_price(₹)`' does not exist. Did you mean one of the following? [];
 Error Category: SYNTAX_ERROR; SyntaxError: invalid syntax. Perhaps you forgot a comma? (amazonsales-sk-job.py, line 103)
 
