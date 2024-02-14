@@ -1,7 +1,7 @@
 from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, translate, expr, count
+from pyspark.sql.functions import col, translate
 from awsglue.dynamicframe import DynamicFrame
 from awsglue.utils import getResolvedOptions
 import sys
@@ -76,8 +76,8 @@ def apply_business_logic(df):
 df_cleaned = apply_business_logic(df_original)
 
 # Apply additional business logic transformations
-df_above_4 = df_cleaned.withColumn("above_4_rating", when(col("rating") > 4.0, 1).otherwise(0))
-df_above_4_below_3 = df_cleaned.withColumn("3to4_rating", when((col("rating") > 3.0) & (col("rating") < 4.0), 1).otherwise(0))
+df_above_4 = df_cleaned.filter(col("rating") > 4.0)
+df_above_4_below_3 = df_cleaned.filter((col("rating") > 4.0) & (col("rating") < 3.0))
 
 windowSpec = Window.partitionBy("product_id")
 df_with_bad_review_percentage = df_cleaned.withColumn("bad_review_percentage", (count("product_id").over(windowSpec) - 1) / count("product_id").over(windowSpec) * 100)
@@ -93,10 +93,6 @@ df_ranked_by_rating_count = df_ranked_by_rating_count.select(*num_columns)
 
 # Combine DataFrames using union
 final_df = df_above_4.union(df_above_4_below_3).union(df_with_bad_review_percentage).union(df_ranked_by_rating_count)
-
-# Drop unnecessary columns
-drop_columns = ["user_id", "user_name", "review_id", "review_title", "review_content", "img_link", "product_link", "about_product"]
-final_df = final_df.drop(*drop_columns)
 
 # Write results to S3 as a single Parquet file
 final_df.coalesce(1).write.parquet(s3_output_path, mode="overwrite")
