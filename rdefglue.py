@@ -1,11 +1,11 @@
+import sys
 from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, translate, expr, count, sum, desc
+from pyspark.sql.functions import col, translate, expr, count, row_number
 from awsglue.dynamicframe import DynamicFrame
 from awsglue.utils import getResolvedOptions
 from pyspark.sql.types import IntegerType, FloatType
-from pyspark.sql.window import Window
 
 # Create a SparkContext
 sc = SparkContext()
@@ -69,18 +69,24 @@ def apply_business_logic(df):
     df = replace_null_values(df)
     df = drop_duplicate_rows(df)
     df = change_data_formats(df)
-    df = df.withColumn("above_4_rating", expr("IF(rating > 4, 1, 0)")) \
-           .withColumn("3to4_rating", expr("IF(rating >= 3 AND rating <= 4, 1, 0)"))
-    df = df.withColumn("brandname", expr("translate(substring_index(category, '|', 1), '_', ' ')"))
-    windowSpec = Window.partitionBy("product_id")
-    df = df.withColumn("bad_review_percentage", (count("product_id").over(windowSpec) - 1) / count("product_id").over(windowSpec) * 100)
-    df = df.withColumn("rank", expr("rank() over (order by rating_count desc)"))
-    top_performers_list = df.select("product_id").distinct().limit(10)
-    df = df.withColumn("top_performer", expr("IF(product_id in ({0}), 1, 0)".format(','.join([str(row.product_id) for row in top_performers_list.collect()]))))
     return df
 
 # Apply basic data cleaning and transformation operations
 df_cleaned = apply_business_logic(df_original)
+
+# Calculate above_4_rating and 3<rating>4 at the row level
+df_cleaned = df_cleaned.withColumn("above_4_rating", (col("rating") > 4.0).cast(IntegerType()))
+df_cleaned = df_cleaned.withColumn("3to4_rating", ((col("rating") >= 3.0) & (col("rating") < 4.0)).cast(IntegerType()))
+
+# Calculate bad_review_percentage
+windowSpec = Window.partitionBy("product_id")
+df_cleaned = df_cleaned.withColumn("bad_review_percentage", (count("product_id").over(windowSpec) - 1) / count("product_id").over(windowSpec) * 100)
+
+# Extract sub_category_level from category column
+df_cleaned = df_cleaned.withColumn("sub_category_level", expr("split(category, '\\\\|')"))
+
+# Assume product hierarchy is the first three levels of the category
+df_cleaned = df_cleaned.withColumn("product_hierarchy", expr("concat_ws(' > ', sub_category_level[0], sub_category_level[1], sub_category_level[2])"))
 
 # Write results to S3 as a single Parquet file
 df_cleaned.coalesce(1).write.parquet(s3_output_path, mode="overwrite")
