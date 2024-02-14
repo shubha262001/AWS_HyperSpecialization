@@ -2,7 +2,7 @@ from awsglue.context import GlueContext
 from awsglue.job import Job
 from pyspark.context import SparkContext
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, avg, when, desc, sum
+from pyspark.sql.functions import col, avg, when, desc, sum, count
 from pyspark.sql.types import FloatType
 
 # Create a GlueContext
@@ -54,5 +54,5 @@ top_performers_list = top_performers_df.select("product_id").collect()
 df = df.withColumn("top_performer", when(col("product_id").isin(top_performers_list), 1).otherwise(0))
 
 # Write the final DataFrame to a single Parquet file
-final_df = df.join(aggregated_df, "product_id").drop("rating_count")
+final_df = df.join(aggregated_df, "product_id")
 final_df.coalesce(1).write.parquet(s3_output_path, mode="overwrite")
