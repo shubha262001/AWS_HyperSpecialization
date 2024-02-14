@@ -75,24 +75,5 @@ def apply_business_logic(df):
 # Apply basic data cleaning and transformation operations
 df_cleaned = apply_business_logic(df_original)
 
-# Apply additional business logic transformations
-df_above_4 = df_cleaned.filter(col("rating") > 4.0)
-df_above_4_below_3 = df_cleaned.filter((col("rating") > 4.0) & (col("rating") < 3.0))
-
-windowSpec = Window.partitionBy("product_id")
-df_with_bad_review_percentage = df_cleaned.withColumn("bad_review_percentage", (count("product_id").over(windowSpec) - 1) / count("product_id").over(windowSpec) * 100)
-
-df_ranked_by_rating_count = df_cleaned.withColumn("rank", expr("rank() over (order by rating_count desc)"))
-
-# Ensure all DataFrames have the same number of columns
-num_columns = df_cleaned.columns
-df_above_4 = df_above_4.select(*num_columns)
-df_above_4_below_3 = df_above_4_below_3.select(*num_columns)
-df_with_bad_review_percentage = df_with_bad_review_percentage.select(*num_columns)
-df_ranked_by_rating_count = df_ranked_by_rating_count.select(*num_columns)
-
-# Combine DataFrames using union
-final_df = df_above_4.union(df_above_4_below_3).union(df_with_bad_review_percentage).union(df_ranked_by_rating_count)
-
 # Write results to S3 as a single Parquet file
-final_df.coalesce(1).write.parquet(s3_output_path, mode="overwrite")
+df_cleaned.coalesce(1).write.parquet(s3_output_path, mode="overwrite")
