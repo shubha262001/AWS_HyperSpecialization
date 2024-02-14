@@ -1,3 +1,28 @@
+# Function to remove symbols from column names
+def clean_column_name(name):
+    return ''.join(e for e in name if e.isalnum())
+
+# Rename columns and remove special characters
+def rename_and_clean_columns(df):
+    df = df.withColumnRenamed("discounted_price", "discounted_price(₹)") \
+           .withColumnRenamed("actual_price", "actual_price(₹)")
+
+    # Remove special characters from column names
+    for col_name in df.columns:
+        new_col_name = clean_column_name(col_name)
+        df = df.withColumnRenamed(col_name, new_col_name)
+
+    df = df.withColumn("discounted_price(₹)", df["discounted_price(₹)"].cast(IntegerType())) \
+           .withColumn("actual_price(₹)", df["actual_price(₹)"].cast(IntegerType()))
+    return df
+
+# Apply the function to rename and clean columns
+df_cleaned = rename_and_clean_columns(df_original)
+
+
+
+
+
 error: Error Category: QUERY_ERROR; Spark Error Class: MISSING_COLUMN; AnalysisException: Column '`discounted_price(₹)`' does not exist. Did you mean one of the following? [];
 ...............
 glue job script: 
