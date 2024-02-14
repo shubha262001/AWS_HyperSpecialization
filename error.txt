@@ -1,3 +1,7 @@
+Error Category: QUERY_ERROR; AnalysisException: Cannot resolve column name "rating" among (PAR1ħ��L��4)
+
+
+
 {
   "product_id": "B08MVSGXMY",
   "product_name": "Crompton Insta Comfy 800 Watt Room Heater with 2 Heat Settings(Grey Blue)",
