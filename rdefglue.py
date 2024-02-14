@@ -1,10 +1,9 @@
 from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, translate
+from pyspark.sql.functions import col, translate, expr, count, sum, desc
 from awsglue.dynamicframe import DynamicFrame
 from awsglue.utils import getResolvedOptions
-import sys
 from pyspark.sql.types import IntegerType, FloatType
 from pyspark.sql.window import Window
 
@@ -70,6 +69,14 @@ def apply_business_logic(df):
     df = replace_null_values(df)
     df = drop_duplicate_rows(df)
     df = change_data_formats(df)
+    df = df.withColumn("above_4_rating", expr("IF(rating > 4, 1, 0)")) \
+           .withColumn("3to4_rating", expr("IF(rating >= 3 AND rating <= 4, 1, 0)"))
+    df = df.withColumn("brandname", expr("translate(substring_index(category, '|', 1), '_', ' ')"))
+    windowSpec = Window.partitionBy("product_id")
+    df = df.withColumn("bad_review_percentage", (count("product_id").over(windowSpec) - 1) / count("product_id").over(windowSpec) * 100)
+    df = df.withColumn("rank", expr("rank() over (order by rating_count desc)"))
+    top_performers_list = df.select("product_id").distinct().limit(10)
+    df = df.withColumn("top_performer", expr("IF(product_id in ({0}), 1, 0)".format(','.join([str(row.product_id) for row in top_performers_list.collect()]))))
     return df
 
 # Apply basic data cleaning and transformation operations
