@@ -1,3 +1,5 @@
+Error Category: QUERY_ERROR; AnalysisException: Cannot resolve column name "discounted_price(₹)" among ()
+
 # Clean the price columns and rename them
 df['discounted_price(₹)'] = df['discounted_price'].str.replace('[^\d.]', '', regex=True).astype(float)
 df['actual_price(₹)'] = df['actual_price'].str.replace('[^\d.]', '', regex=True).astype(float)
