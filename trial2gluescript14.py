@@ -45,7 +45,7 @@ aggregated_df = df.groupBy("product_id").agg(
 
 # Calculate top performers based on the rating count
 top_performers_df = aggregated_df.orderBy(desc("above_4_rating_count")).limit(10)
-top_performers_list = top_performers_df.select("product_id").collect()
+top_performers_list = [row.product_id for row in top_performers_df.collect()]
 
 # Add a column indicating whether a product is a top performer
 df = df.withColumn("top_performer", when(col("product_id").isin(top_performers_list), 1).otherwise(0))
