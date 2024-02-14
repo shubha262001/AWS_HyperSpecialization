@@ -32,10 +32,6 @@ def remove_symbols(column):
 
 # Function to change column names and remove symbols
 def rename_and_clean_columns(df):
-    df = df.withColumnRenamed("discounted_price", "discounted_price(₹)") \
-           .withColumnRenamed("actual_price", "actual_price(₹)") \
-           .withColumn("discounted_price(₹)", remove_symbols(col("discounted_price(₹)"))) \
-           .withColumn("actual_price(₹)", remove_symbols(col("actual_price(₹)")))
     df = df.withColumn("discounted_price(₹)", df["discounted_price(₹)"].cast(IntegerType())) \
            .withColumn("actual_price(₹)", df["actual_price(₹)"].cast(IntegerType()))
     return df
