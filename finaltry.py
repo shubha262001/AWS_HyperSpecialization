@@ -21,7 +21,7 @@ drop_columns = ["user_id", "user_name", "review_id", "review_title", "review_con
 df = df.drop(*drop_columns)
 
 # Convert the 'rating' column to numeric type
-df = df.withColumn("rating", df["rating"].cast("float"))
+df = df.withColumn("rating", col("rating").cast("float"))
 
 # Calculate above_4_rating and 3to4_rating at the row level
 df = df.withColumn("above_4_rating", when(col("rating") > 4.0, 1).otherwise(0))
