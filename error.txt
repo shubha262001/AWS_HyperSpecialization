@@ -1,3 +1,5 @@
+Error Category: UNSUPPORTED_OPERATION_ERROR; An error occurred while calling z:org.apache.spark.sql.functions.lit. The feature is not supported: literal for '[B01GGKYKQM]' of class java.util.ArrayList.
+
 Error Category: QUERY_ERROR; AnalysisException: Cannot resolve column name "rating" among (PAR1ħ��L��4)
 
 
