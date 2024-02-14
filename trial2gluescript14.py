@@ -3,7 +3,6 @@ from awsglue.job import Job
 from pyspark.context import SparkContext
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, avg, when, count, desc
-from pyspark.sql.types import FloatType
 
 # Create a GlueContext
 sc = SparkContext()
@@ -38,20 +37,16 @@ df = df.withColumn("3to4_rating", when((col("rating") >= 3.0) & (col("rating") <
 
 # Aggregate to get the total rating count for each product
 aggregated_df = df.groupBy("product_id").agg(
-    avg("rating").cast(FloatType()).alias("average_rating"),
+    avg("rating").cast("float").alias("average_rating"),
     sum("above_4_rating").alias("above_4_rating_count"),
     sum("3to4_rating").alias("3to4_rating_count")
 )
 
 # Calculate top performers based on the rating count
 top_performers_df = aggregated_df.orderBy(desc("above_4_rating_count")).limit(10)
-top_performers_list = [row.product_id for row in top_performers_df.collect()]
 
 # Add a column indicating whether a product is a top performer
-df = df.withColumn("top_performer", when(col("product_id").isin(top_performers_list), 1).otherwise(0))
-
-# Join the aggregated data back to the original DataFrame
-final_df = df.join(aggregated_df, "product_id").drop("total_rating_count")
+df = df.join(top_performers_df.select("product_id"), "product_id", "left_outer").withColumn("top_performer", when(col("product_id").isNotNull(), 1).otherwise(0))
 
 # Write the final DataFrame to a single Parquet file
-final_df.coalesce(1).write.parquet(s3_output_path, mode="overwrite")
+df.coalesce(1).write.parquet(s3_output_path, mode="overwrite")
