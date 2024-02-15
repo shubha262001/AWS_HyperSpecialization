@@ -7,6 +7,127 @@ from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from pyspark.sql import SparkSession
+from pyspark.sql.functions import split, col, lit, udf, when, split, count
+from pyspark.sql.types import FloatType
+from awsglue.job import Job
+import csv
+
+######DEFINE FUNCTIONS TO TRANFORM DATA####
+############################################
+def extract_brand_name(dataframe):
+    return dataframe.withColumn("brand_name", split(col("product_name"), " ")[0])
+
+####FUNCTION TO CREATE CATEGORIES  ###
+def split_column_and_expand(df, column, delimiter='\|'):
+    """
+    Split a specified column by a delimiter and expand it into separate columns.
+   
+    Args:
+        df (DataFrame): Input DataFrame.
+        column (str): Name of the column to split.
+        delimiter (str): Delimiter used to split the column (default is '|').
+   
+    Returns:
+        DataFrame: DataFrame with the original column split into separate columns.
+    """
+    # Split the specified column by the delimiter and expand it into separate columns
+    df_split = df.withColumn("temp_categories", split(col(column), delimiter))
+   
+    # Select individual elements from the array and alias them as separate columns dynamically
+    select_cols = [col("temp_categories")[i].alias(f"{column}_layer_{i+1}") for i in range(5)]
+    
+    # Select the original columns along with the newly created subcategory columns
+    all_cols = [*df.columns, *select_cols]
+    df_split = df_split.select(*all_cols)
+   
+    # Drop the original 'category' column
+    df_split = df_split.drop(column)
+   
+    return df_split
+
+####FUNCTION TO CALCULATE above_4_rating, 3to4_rating,bad_review_percentage,product_heirarchy ###
+
+def calculate_review_metrics(df):
+    df = df.withColumn("above_4_rating", when(col("rating") > 4, 1).otherwise(0)) \
+           .withColumn("3to4_rating", when((col("rating") >= 3) & (col("rating") <= 4), 1).otherwise(0)) \
+           .withColumn("bad_review_percentage", (count(when(col("rating") < 3, True)) / count("rating")) * 100) \
+           .withColumn("product_hierarchy", split(col("category"), "\|"))
+    return df
+
+###MORE TRANSFORMATIONS###
+
+def select_desired_columns(dataframe):
+    return dataframe.select('product_id', 'discounted_price(₹)', 'actual_price(₹)', 'rating', 'rating_count', 'product_name', 'category')
+
+def move_file(input_path, output_path, filename, dataframe):
+    # Write transformed data to new folder
+    output_file_path = os.path.join(output_path, filename)
+    dataframe.write.parquet(output_file_path)
+   
+    # Remove original file
+    os.remove(os.path.join(input_path, filename))
+
+def replace_null_with_zero(data):
+    # Replace null values in the rating_count column with zeros
+    data_with_zeros = data.fillna(0)
+   
+    return data_with_zeros
+
+####RECIEVING INPUTS #######
+# @params: [JOB_NAME]
+args = getResolvedOptions(sys.argv, ['JOB_NAME'])
+
+sc = SparkContext()
+glueContext = GlueContext(sc)
+spark = glueContext.spark_session
+job = Job(glueContext)
+job.init(args['JOB_NAME'], args)
+
+# Define source and target paths
+s3_input_path = "s3://amazonsales-capstone-sk/cleanedfiles/"
+s3_output_path = "s3://amazonsales-capstone-sk/transformed/"
+
+# Get list of files in the input path
+input_files = glueContext.spark_session._jvm.org.apache.hadoop.fs.FileSystem.get(
+    glueContext._jvm.java.net.URI(s3_input_path), glueContext._jsc.hadoopConfiguration()
+).listStatus(glueContext._jvm.org.apache.hadoop.fs.Path(s3_input_path))
+
+###FUNCTIONING PART OF CODE #######
+
+for file_status in input_files:
+    input_file_path = file_status.getPath().toString()
+   
+    # Load data
+    data = spark.read.parquet(input_file_path)
+   
+    # Apply transformations
+    data = select_desired_columns(data)
+    data = extract_brand_name(data)
+    data = replace_null_with_zero(data)
+    data = calculate_review_metrics(data)
+    data = split_column_and_expand(data,'category')
+    data_transformed = data.coalesce(1)  # Repartition into 1 partition
+    
+    # Write cleaned data to the output path in Parquet format
+    data_transformed.write.parquet(s3_output_path, mode="overwrite")
+  
+job.commit()
+
+
+
+
+
+=====================================================================
+prathek
+#####IMPORT REQUIRED LIBRARIES ######
+
+import os
+import sys
+from awsglue.transforms import *
+from awsglue.utils import getResolvedOptions
+from pyspark.context import SparkContext
+from awsglue.context import GlueContext
+from pyspark.sql import SparkSession
 from pyspark.sql.functions import split, col, lit, udf, when, split
 from pyspark.sql.types import FloatType
 from awsglue.job import Job
