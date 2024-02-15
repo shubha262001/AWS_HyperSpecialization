@@ -32,7 +32,7 @@ def remove_symbols(column):
 
 # Function to change column names and remove symbols
 def rename_and_clean_columns(df):
-    df = df.drop('user_name', 'review_id', 'review_title', 'review_content', 'img_link', 'product_link')\
+    df = df.drop('user_name', 'review_id', 'review_title', 'review_content', 'img_link', 'product_link','about_product')\
            .withColumnRenamed("discounted_price", "discounted_price(₹)") \
            .withColumnRenamed("actual_price", "actual_price(₹)") \
            .withColumn("discounted_price(₹)", remove_symbols(col("discounted_price(₹)"))) \
