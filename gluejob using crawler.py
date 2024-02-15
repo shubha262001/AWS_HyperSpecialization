@@ -2,8 +2,8 @@ import sys
 from awsglue.context import GlueContext
 from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
-from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, translate, expr, count, desc, split, substring, round
+from pyspark.sql.window import Window
 from pyspark.sql.types import IntegerType, FloatType
 
 # Create a GlueContext
@@ -31,8 +31,9 @@ def remove_symbols(column):
 
 # Function to clean discount_percentage column
 def clean_discount_percentage(df):
-    df = df.withColumn("discount_percentage", remove_symbols(col("discount_percentage"))) \
-           .withColumn("discount_percentage", col("discount_percentage").cast(FloatType()))
+    if "discount_percentage" in df.columns:
+        df = df.withColumn("discount_percentage", remove_symbols(col("discount_percentage"))) \
+               .withColumn("discount_percentage", col("discount_percentage").cast(FloatType()))
     return df
 
 # Function to replace null values with 'N.A.'
