@@ -1,5 +1,78 @@
 import os
 import sys
+from awsglue.utils import getResolvedOptions
+from pyspark.context import SparkContext
+from awsglue.context import GlueContext
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import split, col, lit, udf, when
+from pyspark.sql.types import FloatType
+from awsglue.job import Job
+
+def extract_brand_name(dataframe):
+    return dataframe.withColumn("brand_name", split(col("product_name"), " ")[0])
+
+def split_column_and_expand(df, column, delimiter='\|'):
+    df_split = df.withColumn("temp_categories", split(col(column), delimiter))
+    select_cols = [col("temp_categories")[i].alias(f"{column}_layer_{i+1}") for i in range(5)]
+    all_cols = [*df.columns, *select_cols]
+    df_split = df_split.select(*all_cols)
+    df_split = df_split.drop(column)
+    return df_split
+
+def select_desired_columns(dataframe):
+    return dataframe.select('product_id', 'discounted_price(₹)', 'actual_price(₹)', 'rating', 'rating_count', 'product_name', 'category')
+
+def replace_null_with_zero(data):
+    data_with_zeros = data.fillna(0)
+    return data_with_zeros
+
+def calculate_above_4_rating(rating):
+    return when(rating > 4, 1).otherwise(0)
+
+def calculate_3_to_4_rating(rating):
+    return when((rating >= 3) & (rating <= 4), 1).otherwise(0)
+
+def calculate_bad_review_percentage(rating_count):
+    return ((rating_count - 1) / rating_count) * 100
+
+def calculate_top_performers(df):
+    top_performers_list = df.groupBy("product_id").count().orderBy(col("count").desc()).limit(10).select("product_id")
+    return df.withColumn("top_performer", col("product_id").isin(top_performers_list).cast(FloatType()))
+
+args = getResolvedOptions(sys.argv, ['JOB_NAME'])
+
+sc = SparkContext()
+glueContext = GlueContext(sc)
+spark = glueContext.spark_session
+job = Job(glueContext)
+job.init(args['JOB_NAME'], args)
+
+s3_input_path = "s3://amazonsales-capstone-sk/cleanedfiles/"
+s3_output_path = "s3://amazonsales-capstone-sk/transformed/"
+
+input_file_path = args['input_file_path']
+data = spark.read.parquet(input_file_path)
+data = select_desired_columns(data)
+data = extract_brand_name(data)
+data = replace_null_with_zero(data)
+data = split_column_and_expand(data,'category')
+data = data.withColumn('above_rating_4', calculate_above_4_rating(col('rating')))
+data = data.withColumn('3_to_4_rating', calculate_3_to_4_rating(col('rating')))
+data = data.withColumn('bad_review_percentage', lit(calculate_bad_review_percentage(col('rating_count'))).cast(FloatType()))
+data = calculate_top_performers(data)
+data = data.drop('user_name', 'review_id', 'review_title', 'review_content', 'img_link', 'product_link', 'user_id', 'about_product')
+data_transformed = data.coalesce(1)
+
+print(f"Writing transformed data to: {s3_output_path}")
+data_transformed.write.mode("overwrite").parquet(s3_output_path)
+print("Data saved successfully")
+
+job.commit()
+
+
+======================================
+import os
+import sys
 from awsglue.transforms import *
 from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
