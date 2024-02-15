@@ -1,3 +1,5 @@
+Error Category: UNSUPPORTED_OPERATION_ERROR; An error occurred while calling o173.parquet. org.apache.spark.sql.execution.datasources.SchemaColumnConvertNotSupportedException
+
 Error Category: QUERY_ERROR; AnalysisException: Can't extract value from create_product_hierarchy(category#169)#186: need struct type but got string
 
 
