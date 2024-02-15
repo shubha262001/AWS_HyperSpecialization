@@ -1,3 +1,7 @@
+# Drop specified columns
+drop_columns = ['user_name', 'review_id', 'review_title', 'review_content', 'img_link', 'product_link', 'about_product']
+data_transformed = data_transformed.drop(*drop_columns)
+
 #####IMPORT REQUIRED LIBRARIES ######
 
 import os
