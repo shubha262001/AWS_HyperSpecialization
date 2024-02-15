@@ -1,3 +1,6 @@
+Error Category: INVALID_ARGUMENT_ERROR; GlueArgumentError: the following arguments are required: --input_file_path
+
+
 Error Category: QUERY_ERROR; Spark Error Class: MISSING_COLUMN; AnalysisException: Column '`discounted_price(₹)`' does not exist. Did you mean one of the following? [];
 
 [
