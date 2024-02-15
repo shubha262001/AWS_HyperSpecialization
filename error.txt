@@ -1,3 +1,6 @@
+Error Category: QUERY_ERROR; AnalysisException: Can't extract value from create_product_hierarchy(category#169)#186: need struct type but got string
+
+
 {
   "product_id": "B07JW9H4J1",
   "product_name": "Wayona Nylon Braided USB to Lightning Fast Charging and Data Sync Cable Compatible for iPhone 13, 12,11, X, 8, 7, 6, 5, iPad Air, Pro, Mini (3 FT Pack of 1, Grey)",
