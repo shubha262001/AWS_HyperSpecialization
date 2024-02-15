@@ -1,3 +1,28 @@
+{
+  "product_id": "B07JW9H4J1",
+  "product_name": "Wayona Nylon Braided USB to Lightning Fast Charging and Data Sync Cable Compatible for iPhone 13, 12,11, X, 8, 7, 6, 5, iPad Air, Pro, Mini (3 FT Pack of 1, Grey)",
+  "category": "Computers&Accessories|Accessories&Peripherals|Cables&Accessories|Cables|USBCables",
+  "discounted_price": 399,
+  "actual_price": 1099,
+  "discount_percentage": "64%",
+  "rating": "4.2",
+  "rating_count": "24,269",
+  "user_id": "AG3D6O4STAQKAY2UVGEUV46KN35Q,AHMY5CWJMMK5BJRBBSNLYT3ONILA,AHCTC6ULH4XB6YHDY6PCH2R772LQ,AGYHHIERNXKA6P5T7CZLXKVPT7IQ,AG4OGOFWXJZTQ2HKYIOCOY3KXF2Q,AENGU523SXMOS7JPDTW52PNNVWGQ,AEQJHCVTNINBS4FKTBGQRQTGTE5Q,AFC3FFC5PKFF5PMA52S3VCHOZ5FQ",
+  "brand_name": "Wayona",
+  "main_category": "Computers&Accessories",
+  "sub_category_1": "Accessories&Peripherals",
+  "sub_category_2": "Cables&Accessories",
+  "sub_category_3": "Cables",
+  "sub_category_4": "USBCables",
+  "above_4_rating": 0,
+  "3to4_rating": 1,
+  "bad_review_percentage": 0
+}
+
+
+
+
+
 sucess.....>>>>>>
 import sys
 from awsglue.utils import getResolvedOptions
