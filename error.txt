@@ -1,3 +1,70 @@
+[
+  {
+    "Name": "product_id",
+    "Type": "string"
+  },
+  {
+    "Name": "product_name",
+    "Type": "string"
+  },
+  {
+    "Name": "category",
+    "Type": "string"
+  },
+  {
+    "Name": "discounted_price",
+    "Type": "double"
+  },
+  {
+    "Name": "actual_price",
+    "Type": "double"
+  },
+  {
+    "Name": "discount_percentage",
+    "Type": "string"
+  },
+  {
+    "Name": "rating",
+    "Type": "string"
+  },
+  {
+    "Name": "rating_count",
+    "Type": "string"
+  },
+  {
+    "Name": "about_product",
+    "Type": "string"
+  },
+  {
+    "Name": "user_id",
+    "Type": "string"
+  },
+  {
+    "Name": "user_name",
+    "Type": "string"
+  },
+  {
+    "Name": "review_id",
+    "Type": "string"
+  },
+  {
+    "Name": "review_title",
+    "Type": "string"
+  },
+  {
+    "Name": "review_content",
+    "Type": "string"
+  },
+  {
+    "Name": "img_link",
+    "Type": "string"
+  },
+  {
+    "Name": "product_link",
+    "Type": "string"
+  }
+]
+
 Error Category: QUERY_ERROR; Spark Error Class: MISSING_COLUMN; AnalysisException: Column '`discounted_price(₹)`' does not exist. Did you mean one of the following? [];
 
 
