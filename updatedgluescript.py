@@ -1,3 +1,87 @@
+import sys
+from awsglue.utils import getResolvedOptions
+from pyspark.context import SparkContext
+from awsglue.context import GlueContext
+from awsglue.dynamicframe import DynamicFrame
+from awsglue.job import Job
+from pyspark.sql.functions import col, split, udf, expr
+from pyspark.sql.types import StringType, FloatType
+
+# Create a GlueContext
+glueContext = GlueContext(SparkContext.getOrCreate())
+
+# Get job arguments
+args = getResolvedOptions(sys.argv, ['JOB_NAME'])
+
+# Data Catalog: database and table name
+db_name = "amazon-sales-sk"
+tbl_name = "cleanedfiles"
+
+# S3 location for output
+s3_output_path = "s3://amazonsales-capstone-sk/transformed/"
+
+# Read data into a DynamicFrame using the Data Catalog metadata
+input_dyf = glueContext.create_dynamic_frame.from_catalog(database=db_name, table_name=tbl_name)
+
+# Convert DynamicFrame to DataFrame
+input_df = input_dyf.toDF()
+
+# Define functions for your business logic transformations
+
+# Function to create product hierarchy
+def create_product_hierarchy(category_col):
+    category_split = split(category_col, '\|')
+    return category_split.getItem(0).alias('maincategory'), category_split.getItem(1).alias('subcategory')
+
+# UDF for product hierarchy
+create_product_hierarchy_udf = udf(create_product_hierarchy)
+
+# Function to calculate above_4_rating
+def calculate_above_4_rating(rating_col):
+    return (col(rating_col) > 4).cast(StringType())
+
+# UDF for above_4_rating
+calculate_above_4_rating_udf = udf(calculate_above_4_rating)
+
+# Function to calculate 3to4_rating
+def calculate_3to4_rating(rating_col):
+    return ((col(rating_col) >= 3) & (col(rating_col) <= 4)).cast(StringType())
+
+# UDF for 3to4_rating
+calculate_3to4_rating_udf = udf(calculate_3to4_rating)
+
+# Function to calculate bad_review_percentage
+def calculate_bad_review_percentage(rating_col, rating_count_col):
+    return ((col(rating_count_col) - 1) / col(rating_count_col) * 100).cast(FloatType())
+
+# UDF for bad_review_percentage
+calculate_bad_review_percentage_udf = udf(calculate_bad_review_percentage)
+
+# Apply transformations
+output_df = input_df.withColumn('product_id', col('product_id')) \
+                    .withColumn('discounted_price', col('discounted_price')) \
+                    .withColumn('actual_price', col('actual_price')) \
+                    .withColumn('rating', col('rating')) \
+                    .withColumn('rating_count', col('rating_count')) \
+                    .withColumn('product_name', col('product_name')) \
+                    .withColumn('category', col('category')) \
+                    .withColumn('maincategory', create_product_hierarchy_udf(col('category')).getItem(0)) \
+                    .withColumn('subcategory', create_product_hierarchy_udf(col('category')).getItem(1)) \
+                    .withColumn('above_4_rating', calculate_above_4_rating_udf(col('rating'))) \
+                    .withColumn('3to4_rating', calculate_3to4_rating_udf(col('rating'))) \
+                    .withColumn('bad_review_percentage', calculate_bad_review_percentage_udf(col('rating'), col('rating_count'))) \
+                    .drop('user_name', 'review_id', 'review_title', 'review_content', 'img_link', 'product_link', 'about_product')
+
+# Convert DataFrame back to DynamicFrame
+output_dyf = DynamicFrame.fromDF(output_df, glueContext, 'output_dyf')
+
+# Write the transformed data to the output location
+glueContext.write_dynamic_frame.from_options(frame=output_dyf, connection_type="s3", connection_options={"path": s3_output_path}, format="parquet")
+
+
+
+''lllllllllll==========================new script above-----------------------------
+
 from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from pyspark.sql import SparkSession
