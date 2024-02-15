@@ -45,7 +45,7 @@ sc = SparkContext()
 glueContext = GlueContext(sc)
 spark = glueContext.spark_session
 job = Job(glueContext)
-job.init(args['JOB_NAME'], args)
+job.init('amazon-sales-gluejob-sk', args)
 
 s3_input_path = "s3://amazonsales-capstone-sk/cleanedfiles/"
 s3_output_path = "s3://amazonsales-capstone-sk/transformed/"
