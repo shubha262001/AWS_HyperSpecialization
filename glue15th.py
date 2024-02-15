@@ -59,6 +59,100 @@ def extract_product_hierarchy(category):
 
 # Create a UDF for the extract_product_hierarchy function
 product_hierarchy_udf = udf(extract_product_hierarchy, 
+                            StructType([
+                                StructField("main_category": StringType(), True),
+                                StructField("sub_category_1": StringType(),True),
+                                StructField("sub_category_2": StringType(),True),
+                                StructField("sub_category_3": StringType(),True),
+                                StructField("sub_category_4": StringType(),True)
+                             ]))
+
+# Apply the UDF to create the product hierarchy columns
+df = df.withColumn("product_hierarchy", product_hierarchy_udf(col("category")))
+
+# Expand the struct columns into separate columns
+df = df.withColumn("main_category", col("product_hierarchy.main_category")) \
+    .withColumn("sub_category_1", col("product_hierarchy.sub_category_1")) \
+    .withColumn("sub_category_2", col("product_hierarchy.sub_category_2")) \
+    .withColumn("sub_category_3", col("product_hierarchy.sub_category_3")) \
+    .withColumn("sub_category_4", col("product_hierarchy.sub_category_4"))
+
+# Calculate above_4_rating, 3to4_rating, and bad_review_percentage
+df = df.withColumn("above_4_rating", when(col("rating") > 4, 1).otherwise(0)) \
+    .withColumn("3to4_rating", when((col("rating") >= 3) & (col("rating") <= 4), 1).otherwise(0)) \
+    .withColumn("bad_review_percentage", (1 - (col("above_4_rating") + col("3to4_rating"))))
+
+# Drop unnecessary columns
+drop_columns = ['user_name', 'review_id', 'review_title', 'review_content', 'img_link', 'product_link', 'about_product']
+df_final = df.drop(*drop_columns)
+
+# Write the transformed data back to S3
+df_final.write.mode("overwrite").parquet("s3://amazonsales-capstone-sk/transformed/")
+
+job.commit(),,, error:Error Category: SYNTAX_ERROR; SyntaxError: invalid syntax (amazonsales-gluejob-rsk.py, line 63)
+
+------------------------------------------------------------
+import sys
+from awsglue.utils import getResolvedOptions
+from pyspark.context import SparkContext
+from awsglue.context import GlueContext
+from pyspark.sql.functions import split, col, lit, udf, when
+from pyspark.sql.types import FloatType, StringType, StructType, StructField
+from awsglue.job import Job
+
+# Create a GlueContext
+sc = SparkContext()
+glueContext = GlueContext(sc)
+spark = glueContext.spark_session
+job = Job(glueContext)
+args = getResolvedOptions(sys.argv, ['JOB_NAME'])
+job.init(args['JOB_NAME'], args)
+
+# Define the schema for the DataFrame
+schema = StructType([
+    StructField("product_id", StringType(), True),
+    StructField("product_name", StringType(), True),
+    StructField("category", StringType(), True),
+    StructField("discounted_price", FloatType(), True),
+    StructField("actual_price", FloatType(), True),
+    StructField("discount_percentage", StringType(), True),
+    StructField("rating", StringType(), True),
+    StructField("rating_count", StringType(), True),
+    StructField("about_product", StringType(), True),
+    StructField("user_id", StringType(), True),
+    StructField("user_name", StringType(), True),
+    StructField("review_id", StringType(), True),
+    StructField("review_title", StringType(), True),
+    StructField("review_content", StringType(), True),
+    StructField("img_link", StringType(), True),
+    StructField("product_link", StringType(), True)
+])
+
+# Load the data into a DataFrame
+df = spark.read.format("parquet").schema(schema).load("s3://amazonsales-capstone-sk/cleanedfiles/")
+
+# Extract brand name from the first word of the product_name
+def extract_brand_name(product_name):
+    return product_name.split(" ")[0]
+
+# Create a UDF for the extract_brand_name function
+extract_brand_name_udf = udf(extract_brand_name, StringType())
+
+# Apply the UDF to create the brand_name column
+df = df.withColumn("brand_name", extract_brand_name_udf(col("product_name")))
+
+# Extract product hierarchy from the category column
+def extract_product_hierarchy(category):
+    categories = category.split('|')
+    main_category = categories[0] if len(categories) > 0 else None
+    sub_category_1 = categories[1] if len(categories) > 1 else None
+    sub_category_2 = categories[2] if len(categories) > 2 else None
+    sub_category_3 = categories[3] if len(categories) > 3 else None
+    sub_category_4 = categories[4] if len(categories) > 4 else None
+    return main_category, sub_category_1, sub_category_2, sub_category_3, sub_category_4
+
+# Create a UDF for the extract_product_hierarchy function
+product_hierarchy_udf = udf(extract_product_hierarchy, 
                             ("main_category": StringType(),
                              "sub_category_1": StringType(),
                              "sub_category_2": StringType(),
