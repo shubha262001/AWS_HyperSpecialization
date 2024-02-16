@@ -1,3 +1,6 @@
+Error Category: UNSUPPORTED_OPERATION_ERROR; An error occurred while calling o206.parquet. org.apache.spark.sql.execution.datasources.SchemaColumnConvertNotSupportedException
+
+------------------------------------------------------
 import sys
 from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
