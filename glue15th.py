@@ -1,3 +1,59 @@
+import sys
+from awsglue.utils import getResolvedOptions
+from pyspark.context import SparkContext
+from awsglue.context import GlueContext
+from pyspark.sql.functions import split, col, when, udf
+from pyspark.sql.types import FloatType, StringType, IntegerType
+from pyspark.sql.window import Window
+from pyspark.sql import functions as F
+from awsglue.job import Job
+
+# Create a GlueContext
+sc = SparkContext()
+glueContext = GlueContext(sc)
+spark = glueContext.spark_session
+job = Job(glueContext)
+args = getResolvedOptions(sys.argv, ['JOB_NAME'])
+job.init(args['JOB_NAME'], args)
+
+# Load the data into a DataFrame
+df = spark.read.format("parquet").load("s3://amazonsales-capstone-sk/cleanedfiles/")
+
+# Handle null values by replacing them with zeros
+df = df.na.fill(0)
+
+# Extract brand name from the first word of the product_name
+df = df.withColumn("brand_name", split(col("product_name"), " ")[0])
+
+# Extract product hierarchy from the category column
+df = df.withColumn("main_category", split(col("category"), "\\|")[0]) \
+    .withColumn("sub_category_1", split(col("category"), "\\|")[1]) \
+    .withColumn("sub_category_2", split(col("category"), "\\|")[2]) \
+    .withColumn("sub_category_3", split(col("category"), "\\|")[3]) \
+    .withColumn("sub_category_4", split(col("category"), "\\|")[4])
+
+# Calculate above_4_rating, 3to4_rating, and bad_review_percentage
+df = df.withColumn("above_4_rating", when(col("rating") > 4, 1).otherwise(0)) \
+    .withColumn("3to4_rating", when((col("rating") >= 3) & (col("rating") <= 4), 1).otherwise(0)) \
+    .withColumn("bad_review", when(col("rating") < 3, 1).otherwise(0)) \
+    .withColumn("bad_review_percentage", (F.sum("bad_review").over(Window.partitionBy())) / F.count("rating_count").over(Window.partitionBy()) * 100)
+
+# Identify top performers
+windowSpec = Window.orderBy(col("rating_count").desc())
+df = df.withColumn("top_performer", F.when(F.rank().over(windowSpec) <= 10, 1).otherwise(0))
+
+# Drop unnecessary columns
+drop_columns = ['user_name', 'review_id', 'review_title', 'review_content', 'img_link', 'product_link', 'about_product']
+df_final = df.drop(*drop_columns)
+
+# Write the transformed data back to S3
+df_final.write.mode("overwrite").parquet("s3://amazonsales-capstone-sk/transformed/")
+
+job.commit()
+
+
+
+--------------------------------------------------------------
 {
   "product_id": "B07JW9H4J1",
   "discounted_price(₹)": 399,
