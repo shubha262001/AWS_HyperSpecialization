@@ -1,3 +1,21 @@
+{
+  "product_id": "B07JW9H4J1",
+  "discounted_price": 399,
+  "actual_price": 1099,
+  "discount_percentage": "64%",
+  "rating": "4.2",
+  "rating_count": "24,269",
+  "brand_name": "Wayona",
+  "discount_percentage(%)": 64,
+  "rating_value": 4.2,
+  "above_4_rating": 1,
+  "3to4_rating": 0,
+  "bad_review": 0,
+  "bad_review_percentage": 0,
+  "top_performer": 1
+}
+
+----------------------------------------------------------------------------------
 import sys
 from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
