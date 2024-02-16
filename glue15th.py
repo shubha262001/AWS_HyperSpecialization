@@ -1,3 +1,17 @@
+# Calculate above_4_rating, 3to4_rating, and bad_review_percentage
+df = df.withColumn("above_4_rating", when(col("rating") > 4, 1).otherwise(0)) \
+    .withColumn("3to4_rating", when((col("rating") >= 3) & (col("rating") <= 4), 1).otherwise(0)) \
+    .withColumn("bad_review", when((col("above_4_rating") + col("3to4_rating")) == 0, 1).otherwise(0)) \
+    .withColumn("bad_review_percentage", ((col("bad_review") / col("rating_count").cast(IntegerType())) * 100).cast(FloatType()))
+
+"rating_value": 4.2,
+"discount_percentage": "64%",
+
+
+
+
+
+=============================================================
 {
   "product_id": "B07JW9H4J1",
   "discounted_price": 399,
