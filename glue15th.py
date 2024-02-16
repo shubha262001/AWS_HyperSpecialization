@@ -1,3 +1,26 @@
+{
+  "product_id": "B07JW9H4J1",
+  "discounted_price(₹)": 399,
+  "actual_price(₹)": 1099,
+  "rating": "4.2",
+  "rating_count": "24,269",
+  "brand_name": "Wayona",
+  "main_category": "Computers&Accessories",
+  "sub_category_1": "Accessories&Peripherals",
+  "sub_category_2": "Cables&Accessories",
+  "sub_category_3": "Cables",
+  "sub_category_4": "USBCables",
+  "above_4_rating": 0,
+  "3to4_rating": 1,
+  "bad_review_percentage": 0,
+  "top_performer": 1
+}
+
+
+
+----------------------------------------------------------------------------
+successs;;;;;;;;;;;;
+
 import sys
 from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
