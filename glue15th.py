@@ -1,3 +1,44 @@
+{
+  "product_id": "B08L12N5H1",
+  "discounted_price": 2099,
+  "actual_price": 2499,
+  "discount_percentage": "16%",
+  "rating": "|",
+  "rating_count": "992",
+  "brand_name": "Eureka",
+  "main_category": "Home&Kitchen",
+  "sub_category_1": "Kitchen&HomeAppliances",
+  "sub_category_2": "Vacuum,Cleaning&Ironing",
+  "sub_category_3": "Vacuums&FloorCare",
+  "sub_category_4": "Vacuums",
+  "above_4_rating": 0,
+  "3to4_rating": 0,
+  "bad_review": 0,
+  "bad_review_percentage": 0.4101161995898838,
+  "top_performer": 1
+}
+
+----------------------------------------
+{
+  "product_id": "B00ZRBWPA0",
+  "discounted_price": 159,
+  "actual_price": 180,
+  "discount_percentage": "12%",
+  "rating": "4.3",
+  "rating_count": "989",
+  "brand_name": "Eveready",
+  "main_category": "Electronics",
+  "sub_category_1": "GeneralPurposeBatteries&BatteryChargers",
+  "sub_category_2": "DisposableBatteries",
+  "above_4_rating": 0,
+  "3to4_rating": 1,
+  "bad_review": 0,
+  "bad_review_percentage": 0.4101161995898838,
+  "top_performer": 1
+}
+
+
+-------------------------------------------------------------------------------
 import sys
 from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
