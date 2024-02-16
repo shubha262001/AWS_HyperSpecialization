@@ -1,3 +1,22 @@
+# Create a dynamic frame from the Glue Data Catalog
+dynamic_frame = glueContext.create_dynamic_frame.from_catalog(
+    database="amazon-sales-sk",
+    table_name="cleanedfiles",
+    transformation_ctx="datasource0"
+)
+
+# Convert the dynamic frame to a DataFrame
+df = dynamic_frame.toDF()
+
+
+
+dynamic_frame = glueContext.create_dynamic_frame.from_catalog(
+    database="amazon-sales-sk",
+    table_name="cleanedfiles",
+    transformation_ctx="read_from_glue_catalog"
+)
+
+=======================================================================
 import sys
 from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
