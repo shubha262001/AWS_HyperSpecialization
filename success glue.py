@@ -1,3 +1,87 @@
+cleanedfiles
+Last updated (UTC)
+February 15, 2024 at 18:05:06
+
+
+Version 0 (Current version)
+Actions
+
+Table overview
+
+Data quality
+New
+
+Table details
+
+Advanced properties
+Name
+cleanedfiles
+Description
+-
+Database
+amazon-sales-sk
+Classification
+Parquet
+Location
+s3://amazonsales-capstone-sk/cleanedfiles/
+Connection
+-
+Deprecated
+-
+Last updated
+February 15, 2024 at 18:05:06
+Input format
+org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat
+Output format
+org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat
+Serde serialization lib
+org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe
+
+Schema
+
+Partitions
+
+Indexes
+
+Column statistics
+- new
+Schema (16)
+Edit schema as JSON
+Edit schema
+View and manage the table schema.
+
+
+1
+
+
+#
+	
+Column name
+	
+Data type
+	
+Partition key
+	
+Comment
+
+1	product_id	string	-	-
+2	product_name	string	-	-
+3	category	string	-	-
+4	discounted_price	double	-	-
+5	actual_price	double	-	-
+6	discount_percentage	string	-	-
+7	rating	string	-	-
+8	rating_count	string	-	-
+9	about_product	string	-	-
+10	user_id	string	-	-
+11	user_name	string	-	-
+12	review_id	string	-	-
+13	review_title	string	-	-
+14	review_content	string	-	-
+15	img_link	string	-	-
+16	product_link	string	-	-
+
+----------------------------------------------------------------------------------
 import sys
 from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
