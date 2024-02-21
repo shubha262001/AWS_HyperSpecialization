@@ -1,3 +1,53 @@
+Timestamp
+Message
+No older events at this moment. 
+Retry
+
+2024-02-21T20:57:12.828+05:30	INIT_START Runtime Version: python:3.12.v18 Runtime Version ARN: arn:aws:lambda:us-east-1::runtime:776a3759221679a634181f858871d5514dc74a176f78bc535f822a932845ae5a
+
+2024-02-21T20:57:15.955+05:30	START RequestId: 838e0682-f067-4045-b63f-42f934412760 Version: $LATEST
+
+2024-02-21T20:57:16.701+05:30	An error occurred: An error occurred (NoSuchBucket) when calling the GetObject operation: The specified bucket does not exist
+
+2024-02-21T20:57:16.818+05:30
+[ERROR] NoSuchBucket: An error occurred (NoSuchBucket) when calling the CopyObject operation: The specified bucket does not exist
+Traceback (most recent call last):
+  File "/var/task/lambda_function.py", line 59, in lambda_handler
+    s3.copy_object(Bucket=bucket_name, Key=error_object_key, CopySource={'Bucket': bucket_name, 'Key': object_key})
+  File "/var/lang/lib/python3.12/site-packages/botocore/client.py", line 535, in _api_call
+    return self._make_api_call(operation_name, kwargs)
+  File "/var/lang/lib/python3.12/site-packages/botocore/client.py", line 980, in _make_api_call
+    raise error_class(parsed_response, operation_name)
+
+Copy
+[ERROR] NoSuchBucket: An error occurred (NoSuchBucket) when calling the CopyObject operation: The specified bucket does not exist Traceback (most recent call last):   File "/var/task/lambda_function.py", line 59, in lambda_handler     s3.copy_object(Bucket=bucket_name, Key=error_object_key, CopySource={'Bucket': bucket_name, 'Key': object_key})   File "/var/lang/lib/python3.12/site-packages/botocore/client.py", line 535, in _api_call     return self._make_api_call(operation_name, kwargs)   File "/var/lang/lib/python3.12/site-packages/botocore/client.py", line 980, in _make_api_call     raise error_class(parsed_response, operation_name)
+
+2024-02-21T20:57:16.839+05:30	END RequestId: 838e0682-f067-4045-b63f-42f934412760
+
+2024-02-21T20:57:16.839+05:30	REPORT RequestId: 838e0682-f067-4045-b63f-42f934412760 Duration: 884.70 ms Billed Duration: 885 ms Memory Size: 128 MB Max Memory Used: 128 MB Init Duration: 3124.80 ms
+
+2024-02-21T20:58:19.977+05:30	START RequestId: 838e0682-f067-4045-b63f-42f934412760 Version: $LATEST
+
+2024-02-21T20:58:20.559+05:30	An error occurred: An error occurred (NoSuchBucket) when calling the GetObject operation: The specified bucket does not exist
+
+2024-02-21T20:58:20.599+05:30
+[ERROR] NoSuchBucket: An error occurred (NoSuchBucket) when calling the CopyObject operation: The specified bucket does not exist
+Traceback (most recent call last):
+  File "/var/task/lambda_function.py", line 59, in lambda_handler
+    s3.copy_object(Bucket=bucket_name, Key=error_object_key, CopySource={'Bucket': bucket_name, 'Key': object_key})
+  File "/var/lang/lib/python3.12/site-packages/botocore/client.py", line 535, in _api_call
+    return self._make_api_call(operation_name, kwargs)
+  File "/var/lang/lib/python3.12/site-packages/botocore/client.py", line 980, in _make_api_call
+    raise error_class(parsed_response, operation_name)
+
+Copy
+[ERROR] NoSuchBucket: An error occurred (NoSuchBucket) when calling the CopyObject operation: The specified bucket does not exist Traceback (most recent call last):   File "/var/task/lambda_function.py", line 59, in lambda_handler     s3.copy_object(Bucket=bucket_name, Key=error_object_key, CopySource={'Bucket': bucket_name, 'Key': object_key})   File "/var/lang/lib/python3.12/site-packages/botocore/client.py", line 535, in _api_call     return self._make_api_call(operation_name, kwargs)   File "/var/lang/lib/python3.12/site-packages/botocore/client.py", line 980, in _make_api_call     raise error_class(parsed_response, operation_name)
+
+2024-02-21T20:58:20.619+05:30	END RequestId: 838e0682-f067-4045-b63f-42f934412760
+
+2024-02-21T20:58:20.619+05:30	REPORT RequestId: 838e0682-f067-4045-b63f-42f934412760 Duration: 642.02 ms Billed Duration: 643 ms 
+
+---------------------------------------------------------------
 import boto3
 import pandas as pd
 import pyarrow as pa
