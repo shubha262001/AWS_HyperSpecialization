@@ -1,3 +1,15 @@
+# Split the 'category' column into separate columns
+df = df.withColumn("category_levels", split("category", "\|"))
+df = df.select(
+    "*",
+    col("category_levels")[0].alias("main_category"),
+    col("category_levels")[1].alias("sub_category1"),
+    col("category_levels")[2].alias("sub_category2"),
+    col("category_levels")[3].alias("sub_category3"),
+    col("category_levels")[4].alias("sub_category4")
+).drop("category", "category_levels")
+----------------------------
+
 cleanedfiles
 Last updated (UTC)
 February 15, 2024 at 18:05:06
