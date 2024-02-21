@@ -1,3 +1,33 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "logs:DescribeLogGroups",
+                "logs:DescribeLogStreams",
+                "logs:GetLogEvents",
+                "logs:FilterLogEvents"
+            ],
+            "Resource": [
+                "arn:aws:logs:*:*:*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject",
+                "s3:PutObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::YOUR_BUCKET_NAME/*"
+            ]
+        }
+    ]
+}
+
+
+==============================================================================
 import boto3
 import pandas as pd
 import pyarrow as pa
