@@ -1,3 +1,15 @@
+[ERROR] JSONDecodeError: Invalid \escape: line 1 column 1076 (char 1075)
+Traceback (most recent call last):
+  File "/var/task/lambda_function.py", line 89, in lambda_handler
+    json_object = json.loads(response_string)
+  File "/var/lang/lib/python3.12/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/var/lang/lib/python3.12/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/var/lang/lib/python3.12/json/decoder.py", line 353, in raw_decode
+    obj, end = self.scan_once(s, idx)
+
+----------------------------------------------------------------------------------
 Timestamp
 Message
 No older events at this moment. 
