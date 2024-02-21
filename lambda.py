@@ -1,3 +1,152 @@
+import boto3
+import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
+import io
+from datetime import datetime, timedelta
+
+s3 = boto3.client('s3')
+logs = boto3.client('logs')
+
+def lambda_handler(event, context):
+    bucket_name = "amazonsales-capstone-sk"
+    log_group = '/aws/lambda/sk-func-amazonsales-capstone'
+    object_key = event['Records'][0]['s3']['object']['key']
+    
+    # Check if the file is a CSV
+    if object_key.endswith('.csv'):
+        try:
+            # Get the object from S3
+            response = s3.get_object(Bucket=bucket_name, Key=object_key)
+            csv_data = response['Body'].read().decode('utf-8')
+            
+            # Read CSV data into a DataFrame
+            df = pd.read_csv(io.StringIO(csv_data))
+            
+            # Verify the presence of all required data columns
+            required_columns = ['product_id', 'discounted_price', 'actual_price', 'rating', 'rating_count', 'category']
+            missing_columns = set(required_columns) - set(df.columns)
+            if missing_columns:
+                # Move the file to the error folder if any required column is missing
+                error_object_key = 'errorfiles/' + object_key
+                s3.copy_object(Bucket=bucket_name, Key=error_object_key, CopySource={'Bucket': bucket_name, 'Key': object_key})
+                s3.delete_object(Bucket=bucket_name, Key=object_key)
+                return
+            
+            # Clean the price columns and remove junk and special characters
+            df['discounted_price'] = df['discounted_price'].str.replace('[^\d.]', '', regex=True).astype(float)
+            df['actual_price'] = df['actual_price'].str.replace('[^\d.]', '', regex=True).astype(float)
+            
+            # Convert DataFrame to Parquet format
+            table = pa.Table.from_pandas(df)
+            parquet_file = io.BytesIO()
+            pq.write_table(table, parquet_file)
+            parquet_file.seek(0)
+            
+            # Upload the Parquet file to the cleaned files folder
+            cleaned_object_key = 'cleanedfiles/' + object_key.split('/')[-1].replace('.csv', '.parquet')
+            s3.put_object(Bucket=bucket_name, Key=cleaned_object_key, Body=parquet_file)
+            
+            # Trigger the Glue job
+            trigger_glue_job(bucket_name, cleaned_object_key)
+            print("Glue job triggered successfully.")
+
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+            # Move the file to the error folder if an error occurs
+            error_object_key = 'errorfiles/' + object_key
+            s3.copy_object(Bucket=bucket_name, Key=error_object_key, CopySource={'Bucket': bucket_name, 'Key': object_key})
+            s3.delete_object(Bucket=bucket_name, Key=object_key)
+    else:
+        # Move the file to the error folder if it's not a CSV
+        error_object_key = 'errorfiles/' + object_key
+        s3.copy_object(Bucket=bucket_name, Key=error_object_key, CopySource={'Bucket': bucket_name, 'Key': object_key})
+        s3.delete_object(Bucket=bucket_name, Key=object_key)
+
+def trigger_glue_job(bucket_name, object_key):
+    # Check if the file is a parquet and in the cleanedfiles folder
+    if object_key.startswith('cleanedfiles/') and object_key.endswith('.parquet'):
+        try:
+            # Trigger the Glue job
+            glue = boto3.client('glue')
+            job_name = "amazon-sales-gluejob-sk"
+            response = glue.start_job_run(JobName=job_name)
+            print("Glue job started successfully.")
+
+        except Exception as e:
+            print(f"An error occurred while triggering the Glue job: {str(e)}")
+
+    else:
+        print("File is not in the cleanedfiles folder or not a parquet")
+
+    # Get logs from CloudWatch Logs
+    try:
+        start_query_response = logs.start_query(
+            logGroupName=/aws/lambda/sk-func-amazonsales-capstone,
+            startTime=int((datetime.today() - timedelta(hours=1)).timestamp()) * 1000,
+            endTime=int(datetime.now().timestamp()) * 1000,
+            queryString='fields @timestamp, @message | sort @timestamp desc | limit 20',
+        )
+        query_id = start_query_response['queryId']
+
+        while True:
+            query_status = logs.get_query_results(queryId=query_id)
+            if query_status['status'] == 'Complete':
+                break
+            time.sleep(1)
+
+        query_results = logs.get_query_results(queryId=query_id)
+        log_messages = [r['value'] for r in query_results['results']]
+        
+        # Save log messages to S3
+        log_key = f"cloudwatchlogs/{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.txt"
+        log_data = '\n'.join(log_messages).encode('utf-8')
+        s3.put_object(Bucket=bucket_name, Key=log_key, Body=log_data)
+        print("CloudWatch Logs saved to S3 successfully.")
+
+    except Exception as e:
+        print(f"An error occurred while fetching or saving CloudWatch Logs: {str(e)}")
+
+
+
+error: 	No older events at this moment. 
+Retry
+
+2024-02-21T16:30:43.109+05:30	INIT_START Runtime Version: python:3.12.v18 Runtime Version ARN: arn:aws:lambda:us-east-1::runtime:776a3759221679a634181f858871d5514dc74a176f78bc535f822a932845ae5a
+
+2024-02-21T16:30:43.194+05:30	/var/task/lambda_function.py:37: SyntaxWarning: invalid escape sequence '\d'
+
+2024-02-21T16:30:43.194+05:30	df['discounted_price'] = df['discounted_price'].str.replace('[^\d.]', '', regex=True).astype(float)
+
+2024-02-21T16:30:43.194+05:30	/var/task/lambda_function.py:38: SyntaxWarning: invalid escape sequence '\d'
+
+2024-02-21T16:30:43.194+05:30	df['actual_price'] = df['actual_price'].str.replace('[^\d.]', '', regex=True).astype(float)
+
+2024-02-21T16:30:43.195+05:30	/var/task/lambda_function.py:37: SyntaxWarning: invalid escape sequence '\d'
+
+2024-02-21T16:30:43.195+05:30	df['discounted_price'] = df['discounted_price'].str.replace('[^\d.]', '', regex=True).astype(float)
+
+2024-02-21T16:30:43.195+05:30	/var/task/lambda_function.py:38: SyntaxWarning: invalid escape sequence '\d'
+
+2024-02-21T16:30:43.195+05:30	df['actual_price'] = df['actual_price'].str.replace('[^\d.]', '', regex=True).astype(float)
+
+2024-02-21T16:30:43.198+05:30	START RequestId: 61b8efe2-766b-402c-acdc-31514834c3f5 Version: $LATEST
+
+2024-02-21T16:30:43.199+05:30	[ERROR] Runtime.UserCodeSyntaxError: Syntax error in module 'lambda_function': invalid syntax (lambda_function.py, line 85) Traceback (most recent call last):   File "/var/task/lambda_function.py" Line 85                 logGroupName=/aws/lambda/sk-func-amazonsales-capstone,
+
+2024-02-21T16:30:43.219+05:30	END RequestId: 61b8efe2-766b-402c-acdc-31514834c3f5
+
+2024-02-21T16:30:43.219+05:30	REPORT RequestId: 61b8efe2-766b-402c-acdc-31514834c3f5 Duration: 20.64 ms Billed Duration: 21 ms Memory Size: 128 MB Max Memory Used: 34 MB Init Duration: 88.58 ms
+
+2024-02-21T16:31:44.373+05:30	START RequestId: 61b8efe2-766b-402c-acdc-31514834c3f5 Version: $LATEST
+
+2024-02-21T16:31:44.373+05:30	[ERROR] Runtime.UserCodeSyntaxError: Syntax error in module 'lambda_function': invalid syntax (lambda_function.py, line 85) Traceback (most recent call last):   File "/var/task/lambda_function.py" Line 85                 logGroupName=/aws/lambda/sk-func-amazonsales-capstone,
+
+2024-02-21T16:31:44.375+05:30	END RequestId: 61b8efe2-766b-402c-acdc-31514834c3f5
+
+2024-02-21T16:31:44.375+05:30	REPORT RequestId: 61b8efe2-766b-402c-acdc-31514834c3f5 Duration: 1.91 ms Billed Duration: 2 ms Memory Size: 128 MB Max Memory Used: 35 MB
+
+---------------------------------------------------------------------------------------------------------
 {
     "Version": "2012-10-17",
     "Statement": [
