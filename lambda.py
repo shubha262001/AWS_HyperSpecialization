@@ -1,4 +1,48 @@
 import boto3
+from datetime import datetime, timedelta
+import json
+import time
+
+def lambda_handler(event, context):
+    client = boto3.client('logs')
+    s3 = boto3.client('s3')
+    
+    query = """fields @timestamp, @message | sort @timestamp desc | LIMIT 5"""
+
+    log_group = '/aws/lambda/sk-func-amazonsales-capstone'
+    bucket_name = "amazonsales-capstone-sk"
+    s3_key = "cloudwatchlogs/{}.json".format(datetime.now().strftime('%Y-%m-%d-%H-%M-%S'))
+
+    start_query_response = client.start_query(
+        logGroupName=log_group,
+        startTime=int((datetime.today() - timedelta(hours=24)).timestamp()),
+        endTime=int(datetime.now().timestamp()),
+        queryString=query,
+    )
+
+    query_id = start_query_response['queryId']
+
+    response = None
+
+    while response is None or response['status'] == 'Running':
+        print('Waiting for query to complete ...')
+        time.sleep(1)
+        response = client.get_query_results(queryId=query_id)
+
+    response_string = str(response).replace("'", '"')
+    json_object = json.loads(response_string)
+
+    s3.put_object(Bucket=bucket_name, Key=s3_key, Body=json.dumps(json_object, indent=4))
+
+    return {
+        'statusCode': 200,
+        'body': "Success"
+    }
+
+
+
+------------------------------------------------
+import boto3
 import os
 import time
 
