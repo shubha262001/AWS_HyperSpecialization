@@ -1,4 +1,7 @@
-	No older events at this moment. 
+An error occurred while fetching or saving CloudWatch Logs: list indices must be integers or slices, not str
+
+--------------------------------------------------------------------------------------------------
+No older events at this moment. 
 Retry
 
 2024-02-21T16:38:28.832+05:30	INIT_START Runtime Version: python:3.12.v18 Runtime Version ARN: arn:aws:lambda:us-east-1::runtime:776a3759221679a634181f858871d5514dc74a176f78bc535f822a932845ae5a
