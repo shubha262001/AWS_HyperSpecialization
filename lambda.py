@@ -1,3 +1,28 @@
+	No older events at this moment. 
+Retry
+
+2024-02-21T15:24:28.168+05:30	INIT_START Runtime Version: python:3.12.v18 Runtime Version ARN: arn:aws:lambda:us-east-1::runtime:776a3759221679a634181f858871d5514dc74a176f78bc535f822a932845ae5a
+
+2024-02-21T15:24:28.250+05:30	/var/task/lambda_function.py:37: SyntaxWarning: invalid escape sequence '\d'
+
+2024-02-21T15:24:28.250+05:30	df['discounted_price'] = df['discounted_price'].str.replace('[^\d.]', '', regex=True).astype(float)
+
+2024-02-21T15:24:28.250+05:30	/var/task/lambda_function.py:38: SyntaxWarning: invalid escape sequence '\d'
+
+2024-02-21T15:24:28.250+05:30	df['actual_price'] = df['actual_price'].str.replace('[^\d.]', '', regex=True).astype(float)
+
+2024-02-21T15:24:30.874+05:30	START RequestId: be06c57a-1350-4649-8159-36efa3994176 Version: $LATEST
+
+2024-02-21T15:24:38.464+05:30	Glue job started: {'JobRunId': 'jr_98b5a86f9154d849925668e8368734e38c6a320899b35a0457b9e9c61aade12b', 'ResponseMetadata': {'RequestId': 'a5d771d2-147d-4ff0-8063-7ddf80fb2750', 'HTTPStatusCode': 200, 'HTTPHeaders': {'date': 'Wed, 21 Feb 2024 09:54:38 GMT', 'content-type': 'application/x-amz-json-1.1', 'content-length': '82', 'connection': 'keep-alive', 'x-amzn-requestid': 'a5d771d2-147d-4ff0-8063-7ddf80fb2750'}, 'RetryAttempts': 0}}
+
+2024-02-21T15:24:38.466+05:30	Glue job triggered successfully.
+
+2024-02-21T15:24:38.474+05:30	An error occurred: name 'datetime' is not defined
+
+2024-02-21T15:24:39.137+05:30	END RequestId: be06c57a-1350-4649-8159-36efa3994176
+
+2024-02-21T15:24:39.137+05:30	REPORT RequestId: be06c57a-1350-4649-8159-36efa3994176 Duration: 8263.16 ms Billed Duration: 8264 ms Memory Size: 128 MB Max Memory Used: 128 MB Init Duration: 2703.97 ms
+------------------------------------------------------------------
 import boto3
 import pandas as pd
 import pyarrow as pa
