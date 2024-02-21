@@ -11,7 +11,7 @@ logs = boto3.client('logs')
 
 def lambda_handler(event, context):
     # Get the bucket name and the object key from the event
-    bucket_name = "sk-amazonsales-capstone"
+    bucket_name = "amazonsales-capstone-sk"
     object_key = event['Records'][0]['s3']['object']['key']
     
     # Check if the file is a CSV
@@ -66,7 +66,7 @@ def lambda_handler(event, context):
 
     # Get logs from CloudWatch Logs
     try:
-        log_group = '/aws/lambda/your-lambda-function-name'  # Replace with your Lambda function name
+        log_group = '/aws/lambda/sk-func-amazonsales-capstone'  
         start_query_response = logs.start_query(
             logGroupName=log_group,
             startTime=int((datetime.today() - timedelta(hours=1)).timestamp()) * 1000,
