@@ -1,4 +1,39 @@
-Timestamp
+def fetch_and_save_logs():
+    try:
+        start_query_response = logs.start_query(
+            logGroupName=log_group,
+            startTime=int((datetime.today() - timedelta(hours=1)).timestamp()) * 1000,
+            endTime=int(datetime.now().timestamp()) * 1000,
+            queryString='fields @timestamp, @message | sort @timestamp desc | limit 20',
+        )
+        query_id = start_query_response['queryId']
+
+        print("Query ID:", query_id)
+
+        while True:
+            query_status = logs.get_query_results(queryId=query_id)
+            if query_status['status'] == 'Complete':
+                break
+            print("Query status:", query_status['status'])
+            time.sleep(1)
+
+        query_results = logs.get_query_results(queryId=query_id)
+        if 'results' in query_results and isinstance(query_results['results'], list):
+            log_messages = [r['value'] for r in query_results['results']]
+        else:
+            log_messages = []
+        
+        # Save log messages to S3
+        log_key = f"cloudwatchlogs/{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.txt"
+        log_data = '\n'.join(log_messages).encode('utf-8')
+        s3.put_object(Bucket=bucket_name, Key=log_key, Body=log_data)
+        print("CloudWatch Logs saved to S3 successfully.")
+
+    except Exception as e:
+        print(f"An error occurred while fetching or saving CloudWatch Logs: {str(e)}")
+
+=======================================================================================================
+=Timestamp
 Message
 No older events at this moment. 
 Retry
