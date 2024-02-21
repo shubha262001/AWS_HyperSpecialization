@@ -6,7 +6,6 @@ import io
 import time
 from datetime import datetime, timedelta
 
-
 s3 = boto3.client('s3')
 logs = boto3.client('logs')
 
@@ -102,7 +101,12 @@ def trigger_glue_job(bucket_name, object_key):
         # Save log messages to S3
         log_key = f"cloudwatchlogs/{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.txt"
         log_data = '\n'.join(log_messages).encode('utf-8')
-        s3.put_object(Bucket=b
+        s3.put_object(Bucket=bucket_name, Key=log_key, Body=log_data)
+        print("CloudWatch Logs saved to S3 successfully.")
+
+    except Exception as e:
+        print(f"An error occurred while fetching or saving CloudWatch Logs: {str(e)}")
+
 
 
 -------------------------------------------------------------------------------------------------------------
