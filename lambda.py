@@ -1,3 +1,164 @@
+import boto3
+import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
+import io
+import time
+from datetime import datetime, timedelta
+
+s3 = boto3.client('s3')
+logs = boto3.client('logs')
+ssm = boto3.client('ssm')
+
+def lambda_handler(event, context):
+    bucket_name = "amazonsales-capstone-sk"
+    log_group = '/aws/lambda/sk-func-amazonsales-capstone'
+    object_key = event['Records'][0]['s3']['object']['key']
+    
+    # Check if the file is a CSV
+    if object_key.endswith('.csv'):
+        try:
+            # Get the object from S3
+            response = s3.get_object(Bucket=bucket_name, Key=object_key)
+            csv_data = response['Body'].read().decode('utf-8')
+            
+            # Read CSV data into a DataFrame
+            df = pd.read_csv(io.StringIO(csv_data))
+            
+            # Verify the presence of all required data columns
+            required_columns = ['product_id', 'product_name', 'category', 'discounted_price','actual_price', 'discount_percentage', 'rating', 'rating_count','about_product', 'user_id', 'user_name', 'review_id', 'review_title','review_content', 'img_link', 'product_link']
+            
+            missing_columns = set(required_columns) - set(df.columns)
+            if missing_columns:
+                # Move the file to the error folder if any required column is missing
+                error_object_key = 'errorfiles/' + object_key
+                s3.copy_object(Bucket=bucket_name, Key=error_object_key, CopySource={'Bucket': bucket_name, 'Key': object_key})
+                s3.delete_object(Bucket=bucket_name, Key=object_key)
+                return
+            
+            # Clean the price columns and remove junk and special characters
+            df['discounted_price'] = df['discounted_price'].str.replace(r'[^\d.]', '', regex=True).astype(float)
+            df['actual_price'] = df['actual_price'].str.replace(r'[^\d.]', '', regex=True).astype(float)
+            
+            # Convert DataFrame to Parquet format
+            table = pa.Table.from_pandas(df)
+            parquet_file = io.BytesIO()
+            pq.write_table(table, parquet_file)
+            parquet_file.seek(0)
+            
+            # Upload the Parquet file to the cleaned files folder
+            cleaned_object_key = 'cleanedfiles/' + object_key.split('/')[-1].replace('.csv', '.parquet')
+            s3.put_object(Bucket=bucket_name, Key=cleaned_object_key, Body=parquet_file)
+            
+            # Trigger the Glue job
+            trigger_glue_job(bucket_name, cleaned_object_key)
+            print("Glue job triggered successfully.")
+
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+            # Move the file to the error folder if an error occurs
+            error_object_key = 'errorfiles/' + object_key
+            s3.copy_object(Bucket=bucket_name, Key=error_object_key, CopySource={'Bucket': bucket_name, 'Key': object_key})
+            s3.delete_object(Bucket=bucket_name, Key=object_key)
+    else:
+        # Move the file to the error folder if it's not a CSV
+        error_object_key = 'errorfiles/' + object_key
+        s3.copy_object(Bucket=bucket_name, Key=error_object_key, CopySource={'Bucket': bucket_name, 'Key': object_key})
+
+    # Fetch and save logs
+    fetch_and_save_logs()
+
+def trigger_glue_job(bucket_name, object_key):
+# Check if the file is a parquet and in the cleanedfiles folder
+    if object_key.startswith('cleanedfiles/') and object_key.endswith('.parquet'):
+        try:
+            # Trigger the Glue job
+            glue = boto3.client('glue')
+            job_name = "amazon-sales-gluejob-sk"
+            response = glue.start_job_run(JobName=job_name)
+            print("Glue job started successfully.")
+
+        except Exception as e:
+            print(f"An error occurred while triggering the Glue job: {str(e)}")
+
+    else:
+        print("File is not in the cleanedfiles folder or not a parquet")
+
+
+def fetch_and_save_logs():
+    try:
+        extra_args = {}
+        log_groups = []
+        log_groups_to_export = []
+
+        if 'S3_BUCKET' not in os.environ:
+            print("Error: S3_BUCKET not defined")
+            return
+
+        print("--> S3_BUCKET=%s" % os.environ["S3_BUCKET"])
+
+        while True:
+            response = logs.describe_log_groups(**extra_args)
+            log_groups = log_groups + response['logGroups']
+
+            if not 'nextToken' in response:
+                break
+            extra_args['nextToken'] = response['nextToken']
+
+        for log_group in log_groups:
+            response = logs.list_tags_log_group(logGroupName=log_group['logGroupName'])
+            log_group_tags = response['tags']
+            if 'ExportToS3' in log_group_tags and log_group_tags['ExportToS3'] == 'true':
+                log_groups_to_export.append(log_group['logGroupName'])
+
+        for log_group_name in log_groups_to_export:
+            ssm_parameter_name = ("/log-exporter-last-export/%s" % log_group_name).replace("//", "/")
+            try:
+                ssm_response = ssm.get_parameter(Name=ssm_parameter_name)
+                ssm_value = ssm_response['Parameter']['Value']
+            except ssm.exceptions.ParameterNotFound:
+                ssm_value = "0"
+
+            export_to_time = int(round(time.time() * 1000))
+
+            print("--> Exporting %s to %s" % (log_group_name, os.environ['S3_BUCKET']))
+
+            if export_to_time - int(ssm_value) < (24 * 60 * 60 * 1000):
+                # Haven't been 24hrs from the last export of this log group
+                print("    Skipped until 24hrs from last export is completed")
+                continue
+
+            try:
+                response = logs.create_export_task(
+                    logGroupName=log_group_name,
+                    fromTime=int(ssm_value),
+                    to=export_to_time,
+                    destination=os.environ['S3_BUCKET'],
+                    destinationPrefix=log_group_name.strip("/")
+                )
+                print("    Task created: %s" % response['taskId'])
+                time.sleep(5)
+
+            except logs.exceptions.LimitExceededException:
+                print("    Need to wait until all tasks are finished (LimitExceededException). Continuing later...")
+                return
+
+            except Exception as e:
+                print("    Error exporting %s: %s" % (log_group_name, getattr(e, 'message', repr(e))))
+                continue
+
+            ssm_response = ssm.put_parameter(
+                Name=ssm_parameter_name,
+                Type="String",
+                Value=str(export_to_time),
+                Overwrite=True)
+
+    except Exception as e:
+        print(f"An error occurred while fetching or saving CloudWatch Logs: {str(e)}")
+
+
+
+--------------------------------------------------------------------------
 def fetch_and_save_logs():
     try:
         start_query_response = logs.start_query(
