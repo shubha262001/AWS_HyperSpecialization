@@ -1,5 +1,48 @@
 import boto3
 import os
+import time
+
+s3 = boto3.client('s3')
+logs = boto3.client('logs')
+
+def lambda_handler(event, context):
+    log_group = '/aws/lambda/sk-func-amazonsales-capstone'
+    bucket_name = "amazonsales-capstone-sk"
+    
+    try:
+        start_query_response = logs.start_query(
+            logGroupName=log_group,
+            startTime=int((time.time() - 3600) * 1000),  # Start time 1 hour ago
+            endTime=int(time.time() * 1000),  # End time now
+            queryString='fields @timestamp, @message | sort @timestamp desc | limit 20',
+        )
+        query_id = start_query_response['queryId']
+
+        while True:
+            query_status = logs.get_query_results(queryId=query_id)
+            if query_status['status'] == 'Complete':
+                break
+            time.sleep(1)
+
+        query_results = logs.get_query_results(queryId=query_id)
+        log_messages = [r['value'] for r in query_results['results']]
+        
+        # Save log messages to S3
+        log_key = f"cloudwatchlogs/{time.strftime('%Y-%m-%d-%H-%M-%S')}.txt"
+        log_data = '\n'.join(log_messages).encode('utf-8')
+        s3.put_object(Bucket=bucket_name, Key=log_key, Body=log_data)
+        print("CloudWatch Logs saved to S3 successfully.")
+
+    except Exception as e:
+        print(f"An error occurred while fetching or saving CloudWatch Logs: {str(e)}")
+
+
+
+
+--------------------------------------------------------------------------------------------------------------
+
+import boto3
+import os
 from pprint import pprint
 import time
 
