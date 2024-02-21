@@ -1,3 +1,29 @@
+	No older events at this moment. 
+Retry
+
+2024-02-21T16:38:28.832+05:30	INIT_START Runtime Version: python:3.12.v18 Runtime Version ARN: arn:aws:lambda:us-east-1::runtime:776a3759221679a634181f858871d5514dc74a176f78bc535f822a932845ae5a
+
+2024-02-21T16:38:28.921+05:30	/var/task/lambda_function.py:37: SyntaxWarning: invalid escape sequence '\d'
+
+2024-02-21T16:38:28.921+05:30	df['discounted_price'] = df['discounted_price'].str.replace('[^\d.]', '', regex=True).astype(float)
+
+2024-02-21T16:38:28.921+05:30	/var/task/lambda_function.py:38: SyntaxWarning: invalid escape sequence '\d'
+
+2024-02-21T16:38:28.921+05:30	df['actual_price'] = df['actual_price'].str.replace('[^\d.]', '', regex=True).astype(float)
+
+2024-02-21T16:38:31.790+05:30	START RequestId: a2467a0c-e08c-4215-99c4-5db31eaef9ca Version: $LATEST
+
+2024-02-21T16:38:39.644+05:30	Glue job started successfully.
+
+2024-02-21T16:38:40.334+05:30	An error occurred while fetching or saving CloudWatch Logs: name 'time' is not defined
+
+2024-02-21T16:38:40.335+05:30	Glue job triggered successfully.
+
+2024-02-21T16:38:40.852+05:30	END RequestId: a2467a0c-e08c-4215-99c4-5db31eaef9ca
+
+2024-02-21T16:38:40.852+05:30	REPORT RequestId: a2467a0c-e08c-4215-99c4-5db31eaef9ca Duration: 9062.78 ms Billed Duration: 9063 ms M
+
+------------------------------------------------------------------
 import boto3
 import pandas as pd
 import pyarrow as pa
