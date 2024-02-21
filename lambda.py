@@ -1,3 +1,31 @@
+Timestamp
+Message
+No older events at this moment. 
+Retry
+
+2024-02-21T18:42:30.798+05:30	INIT_START Runtime Version: python:3.12.v18 Runtime Version ARN: arn:aws:lambda:us-east-1::runtime:776a3759221679a634181f858871d5514dc74a176f78bc535f822a932845ae5a
+
+2024-02-21T18:42:33.933+05:30	Query status: Scheduled
+
+2024-02-21T18:42:35.036+05:30	Query status: Running
+
+2024-02-21T18:42:36.241+05:30
+An error occurred while fetching or saving CloudWatch Logs: list indices must be integers or slices, not str
+
+Copy
+An error occurred while fetching or saving CloudWatch Logs: list indices must be integers or slices, not str
+
+2024-02-21T18:42:36.252+05:30	START RequestId: 78a915ea-29b5-453f-a456-63f63b453358 Version: $LATEST
+
+2024-02-21T18:42:43.847+05:30	Glue job started successfully.
+
+2024-02-21T18:42:43.849+05:30	Glue job triggered successfully.
+
+2024-02-21T18:42:44.489+05:30	END RequestId: 78a915ea-29b5-453f-a456-63f63b453358
+
+2024-02-21T18:42:44.489+05:30	REPORT RequestId: 78a915ea-29b5-453f-a456-63f63b453358 Duration: 8237.39 ms Billed Duration: 8238 ms
+
+---------------------------------------------------------------------------
 import boto3
 import pandas as pd
 import pyarrow as pa
