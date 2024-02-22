@@ -1,3 +1,8 @@
+@timestamp=2024-02-21 15:41:20.628
+@message=REPORT RequestId: 0280709d-1b0a-4aa5-86e9-0970d7d39e0b	Duration: 11108.09 ms	Billed Duration: 11109 ms	Memory Size: 128 MB	Max Memory Used: 129 MB	
+@ptr=CnYKOQo1ODk2ODg5OTg1NzE5Oi9hd3MvbGFtYmRhL3NrLWZ1bmMtYW1hem9uc2FsZXMtY2Fwc3RvbmUQABI1GhgCBlmy+KcAAAABOBGDFgAGXWGWIAAAAnIgASjRqtDi3DEw9LbQ4twxOANAxwJIhwxQsQYYACABEAIYAQ==
+----------------------------------------------------------------------
+completely sucesss;;;;
 import boto3
 import pandas as pd
 import pyarrow as pa
