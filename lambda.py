@@ -1,3 +1,11 @@
+Details: "ADO.NET: Python script error.
+<pi>  File "PythonScriptWrapper.PY", line 13
+    pip install pandas
+        ^
+SyntaxError: invalid syntax
+</pi>"
+----------------------------------------------
+pip install pandas
 import pandas as pd
 import boto3
 from io import BytesIO
