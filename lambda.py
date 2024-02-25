@@ -1,3 +1,34 @@
+import pandas as pd
+import boto3
+from io import BytesIO
+
+# Define AWS credentials
+aws_access_key_id = 'AKIA5BUWPDK3VBKTB27C'
+aws_secret_access_key = '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'
+bucket_name = 'data-pipeline-bucket-009'
+folder = 'transformed'  # specify the folder if the files are inside a folder
+
+# Connect to S3
+s3 = boto3.client('s3', 
+                  aws_access_key_id=aws_access_key_id,
+                  aws_secret_access_key=aws_secret_access_key)
+
+# List objects in the folder
+response = s3.list_objects_v2(Bucket=bucket_name, Prefix=f"{folder}/")
+
+# Read Parquet files into a pandas DataFrame
+dfs = []
+for obj in response['Contents']:
+    if obj['Key'].endswith('.parquet'):
+        file_name = obj['Key']
+        obj = s3.get_object(Bucket=bucket_name, Key=file_name)
+        df = pd.read_parquet(BytesIO(obj['Body'].read()))
+        dfs.append(df)
+
+# Concatenate all DataFrames
+result_df = pd.concat(dfs)
+
+-----------------------------------------------------------------------------------------
 @timestamp=2024-02-21 15:41:20.628
 @message=REPORT RequestId: 0280709d-1b0a-4aa5-86e9-0970d7d39e0b	Duration: 11108.09 ms	Billed Duration: 11109 ms	Memory Size: 128 MB	Max Memory Used: 129 MB	
 @ptr=CnYKOQo1ODk2ODg5OTg1NzE5Oi9hd3MvbGFtYmRhL3NrLWZ1bmMtYW1hem9uc2FsZXMtY2Fwc3RvbmUQABI1GhgCBlmy+KcAAAABOBGDFgAGXWGWIAAAAnIgASjRqtDi3DEw9LbQ4twxOANAxwJIhwxQsQYYACABEAIYAQ==
