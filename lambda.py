@@ -1,3 +1,11 @@
+Details: "ADO.NET: Python script error.
+<pi>  File "PythonScriptWrapper.PY", line 13
+    pip install pandas
+        ^
+SyntaxError: invalid syntax
+</pi>"
+
+-----------------------------------------
 Microsoft Windows [Version 10.0.14393]
 (c) 2016 Microsoft Corporation. All rights reserved.
 
