@@ -1,3 +1,30 @@
+C:\Program Files\Python38>python -m pip install --user pandas
+Collecting pandas
+  Using cached https://files.pythonhosted.org/packages/c3/6c/ea362eef61f05553aaf1a24b3e96b2d0603f5dc71a3bd35688a24ed88843/pandas-2.0.3-cp38-cp38-win_amd64.whl
+Collecting python-dateutil>=2.8.2 (from pandas)
+  Using cached https://files.pythonhosted.org/packages/36/7a/87837f39d0296e723bb9b62bbb257d0355c7f6128853c78955f57342a56d/python_dateutil-2.8.2-py2.py3-none-any.whl
+Collecting numpy>=1.20.3; python_version < "3.10" (from pandas)
+  Using cached https://files.pythonhosted.org/packages/69/65/0d47953afa0ad569d12de5f65d964321c208492064c38fe3b0b9744f8d44/numpy-1.24.4-cp38-cp38-win_amd64.whl
+Collecting pytz>=2020.1 (from pandas)
+  Using cached https://files.pythonhosted.org/packages/9c/3d/a121f284241f08268b21359bd425f7d4825cffc5ac5cd0e1b3d82ffd2b10/pytz-2024.1-py2.py3-none-any.whl
+Collecting tzdata>=2022.1 (from pandas)
+  Using cached https://files.pythonhosted.org/packages/65/58/f9c9e6be752e9fcb8b6a0ee9fb87e6e7a1f6bcab2cdc73f02bb7ba91ada0/tzdata-2024.1-py2.py3-none-any.whl
+Collecting six>=1.5 (from python-dateutil>=2.8.2->pandas)
+  Using cached https://files.pythonhosted.org/packages/d9/5a/e7c31adbe875f2abbb91bd84cf2dc52d792b5a01506781dbcf25c91daf11/six-1.16.0-py2.py3-none-any.whl
+Installing collected packages: six, python-dateutil, numpy, pytz, tzdata, pandas
+  WARNING: The script f2py.exe is installed in 'C:\Users\shubha.k\AppData\Roaming\Python\Python38\Scripts' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+Successfully installed numpy-1.24.4 pandas-2.0.3 python-dateutil-2.8.2 pytz-2024.1 six-1.16.0 tzdata-2024.1
+WARNING: You are using pip version 19.2.3, however version 24.0 is available.
+You should consider upgrading via the 'python -m pip install --upgrade pip' command.
+
+C:\Program Files\Python38>
+C:\Program Files\Python38>python -m venu  myenv
+C:\Program Files\Python38\python.exe: No module named venu
+
+C:\Program Files\Python38>
+
+----------------------------------------------------------------------------
 Microsoft Windows [Version 10.0.14393]
 (c) 2016 Microsoft Corporation. All rights reserved.
 
