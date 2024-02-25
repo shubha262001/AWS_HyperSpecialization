@@ -1,4 +1,11 @@
 Details: "ADO.NET: Python script error.
+<pi>Traceback (most recent call last):
+  File "PythonScriptWrapper.PY", line 2, in <module>
+    import os, pandas, matplotlib
+ModuleNotFoundError: No module named 'matplotlib'
+</pi>"
+===============================================
+Details: "ADO.NET: Python script error.
 <pi>  File "PythonScriptWrapper.PY", line 13
     pip install pandas
         ^
