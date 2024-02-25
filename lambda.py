@@ -5,7 +5,7 @@ from io import BytesIO
 # Define AWS credentials
 aws_access_key_id = 'AKIA5BUWPDK3VBKTB27C'
 aws_secret_access_key = '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'
-bucket_name = 'data-pipeline-bucket-009'
+bucket_name = 'amazonsales-capstone-sk'
 folder = 'transformed'  # specify the folder if the files are inside a folder
 
 # Connect to S3
