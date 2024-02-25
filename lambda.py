@@ -1,4 +1,58 @@
-C:\Program Files\Python38>python -m pip install --user pandas
+Microsoft Windows [Version 10.0.14393]
+(c) 2016 Microsoft Corporation. All rights reserved.
+
+C:\Users\shubha.k>cd
+C:\Users\shubha.k
+
+C:\Users\shubha.k>C:\Program Files\Python38
+'C:\Program' is not recognized as an internal or external command,
+operable program or batch file.
+
+C:\Users\shubha.k>C:\Program Files\Python38
+'C:\Program' is not recognized as an internal or external command,
+operable program or batch file.
+
+C:\Users\shubha.k>cd C:\Program Files\Python38
+
+C:\Program Files\Python38>python -m pip install pandas
+Requirement already satisfied: pandas in c:\users\shubha.k\appdata\roaming\python\python38\site-packages (2.0.3)
+Requirement already satisfied: tzdata>=2022.1 in c:\users\shubha.k\appdata\roaming\python\python38\site-packages (from pandas) (2024.1)
+Requirement already satisfied: numpy>=1.20.3; python_version < "3.10" in c:\users\shubha.k\appdata\roaming\python\python38\site-packages (from pandas) (1.24.4)
+Requirement already satisfied: pytz>=2020.1 in c:\users\shubha.k\appdata\roaming\python\python38\site-packages (from pandas) (2024.1)
+Requirement already satisfied: python-dateutil>=2.8.2 in c:\users\shubha.k\appdata\roaming\python\python38\site-packages (from pandas) (2.8.2)
+Requirement already satisfied: six>=1.5 in c:\users\shubha.k\appdata\roaming\python\python38\site-packages (from python-dateutil>=2.8.2->pandas) (1.16.0)
+WARNING: You are using pip version 19.2.3, however version 24.0 is available.
+You should consider upgrading via the 'python -m pip install --upgrade pip' command.
+
+C:\Program Files\Python38>python -m pip install --user boto3 pandas
+Collecting boto3
+  Downloading https://files.pythonhosted.org/packages/a8/ec/5cf74e265bb3fc764cf475cd6208e4d189d4e7938c39f7e499894fa5054d/boto3-1.34.49-py3-none-any.whl (139kB)
+     |████████████████████████████████| 143kB 3.2MB/s
+Requirement already satisfied: pandas in c:\users\shubha.k\appdata\roaming\python\python38\site-packages (2.0.3)
+Collecting botocore<1.35.0,>=1.34.49 (from boto3)
+  Downloading https://files.pythonhosted.org/packages/bd/e3/6bb6c8abea700d5dfeb14bbe41bdfe27e0aa665d06a911397a51e57aaa69/botocore-1.34.49-py3-none-any.whl (12.0MB)
+     |████████████████████████████████| 12.0MB 6.4MB/s
+Collecting jmespath<2.0.0,>=0.7.1 (from boto3)
+  Downloading https://files.pythonhosted.org/packages/31/b4/b9b800c45527aadd64d5b442f9b932b00648617eb5d63d2c7a6587b7cafc/jmespath-1.0.1-py3-none-any.whl
+Collecting s3transfer<0.11.0,>=0.10.0 (from boto3)
+  Downloading https://files.pythonhosted.org/packages/12/bb/7e7912e18cd558e7880d9b58ffc57300b2c28ffba9882b3a54ba5ce3ebc4/s3transfer-0.10.0-py3-none-any.whl (82kB)
+     |████████████████████████████████| 92kB 3.0MB/s
+Requirement already satisfied: tzdata>=2022.1 in c:\users\shubha.k\appdata\roaming\python\python38\site-packages (from pandas) (2024.1)
+Requirement already satisfied: python-dateutil>=2.8.2 in c:\users\shubha.k\appdata\roaming\python\python38\site-packages (from pandas) (2.8.2)
+Requirement already satisfied: numpy>=1.20.3; python_version < "3.10" in c:\users\shubha.k\appdata\roaming\python\python38\site-packages (from pandas) (1.24.4)
+Requirement already satisfied: pytz>=2020.1 in c:\users\shubha.k\appdata\roaming\python\python38\site-packages (from pandas) (2024.1)
+Collecting urllib3<1.27,>=1.25.4; python_version < "3.10" (from botocore<1.35.0,>=1.34.49->boto3)
+  Downloading https://files.pythonhosted.org/packages/b0/53/aa91e163dcfd1e5b82d8a890ecf13314e3e149c05270cc644581f77f17fd/urllib3-1.26.18-py2.py3-none-any.whl (143kB)
+     |████████████████████████████████| 153kB 6.8MB/s
+Requirement already satisfied: six>=1.5 in c:\users\shubha.k\appdata\roaming\python\python38\site-packages (from python-dateutil>=2.8.2->pandas) (1.16.0)
+Installing collected packages: jmespath, urllib3, botocore, s3transfer, boto3
+Successfully installed boto3-1.34.49 botocore-1.34.49 jmespath-1.0.1 s3transfer-0.10.0 urllib3-1.26.18
+WARNING: You are using pip version 19.2.3, however version 24.0 is available.
+You should consider upgrading via the 'python -m pip install --upgrade pip' command.
+
+C:\Program Files\Python38>
+-----------------------------------------------------------------------------------
+-C:\Program Files\Python38>python -m pip install --user pandas
 Collecting pandas
   Using cached https://files.pythonhosted.org/packages/c3/6c/ea362eef61f05553aaf1a24b3e96b2d0603f5dc71a3bd35688a24ed88843/pandas-2.0.3-cp38-cp38-win_amd64.whl
 Collecting python-dateutil>=2.8.2 (from pandas)
