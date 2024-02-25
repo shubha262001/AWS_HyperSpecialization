@@ -1,4 +1,12 @@
 Details: "ADO.NET: Python script error.
+<pi>ImportError: Unable to find a usable engine; tried using: 'pyarrow', 'fastparquet'.
+A suitable version of pyarrow or fastparquet is required for parquet support.
+Trying to import the above resulted in these errors:
+ - Missing optional dependency 'pyarrow'. pyarrow is required for parquet support. Use pip or conda to install pyarrow.
+ - Missing optional dependency 'fastparquet'. fastparquet is required for parquet support. Use pip or conda to install fastparquet.
+</pi>"
+====================================================
+Details: "ADO.NET: Python script error.
 <pi>Traceback (most recent call last):
   File "PythonScriptWrapper.PY", line 2, in <module>
     import os, pandas, matplotlib
